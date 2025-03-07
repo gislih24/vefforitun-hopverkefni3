@@ -28,7 +28,10 @@ app.use(cors());
 // Set Cors-related headers to prevent blocking of local requests
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    res.header(
+        'Access-Control-Allow-Headers',
+        'Origin, X-Requested-With, Content-Type, Accept',
+    );
     next();
 });
 
@@ -170,62 +173,66 @@ Output:
         "description": "Famous leaning bell tower in Pisa, Italy.",
         "visitDuration": "1-2 hours"
       } */
-app.post(apiPath + version + '/destinations/:destinationId/attractions', (req, res) => {
-    const { name, type, description, visitDuration } = req.body;
-    const destinationId = Number(req.params.destinationId);
-    /*  Check that destinationId is a number */
-    if (isNaN(destinationId)) {
-        return res.status(HTTP_STATUS.BAD_REQUEST).json({
-            message: 'Invalid destinationId, it must be a number.',
-        });
-    }
+app.post(
+    apiPath + version + '/destinations/:destinationId/attractions',
+    (req, res) => {
+        const { name, type, description, visitDuration } = req.body;
+        const destinationId = Number(req.params.destinationId);
+        /*  Check that destinationId is a number */
+        if (isNaN(destinationId)) {
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({
+                message: 'Invalid destinationId, it must be a number.',
+            });
+        }
 
-    /*  Check if a destination with destinationId
+        /*  Check if a destination with destinationId
         is a valid destination */
-    const destinationIndex = destinations.findIndex(
-        (destination) => destination.id === destinationId,
-    );
-    if (destinationIndex < 0) {
-        res.status(HTTP_STATUS.BAD_REQUEST).json({
-            message: `Destination with id ${destinationId} does not exist.`,
-        });
-    }
+        const destinationIndex = destinations.findIndex(
+            (destination) => destination.id === destinationId,
+        );
+        if (destinationIndex < 0) {
+            res.status(HTTP_STATUS.BAD_REQUEST).json({
+                message: `Destination with id ${destinationId} does not exist.`,
+            });
+        }
 
-    /*  Validation that name,type,description and visitDuration
+        /*  Validation that name,type,description and visitDuration
         are all in the body and are all strings */
 
-    if (
-        !name ||
-        typeof name !== 'string' ||
-        !type ||
-        typeof type !== 'string' ||
-        !description ||
-        typeof description !== 'string' ||
-        !visitDuration ||
-        typeof visitDuration !== 'string'
-    ) {
-        res.status(HTTP_STATUS.BAD_REQUEST).json({
-            message: 'Body should include name, type, description, visitDuration all as strings',
-        });
-    }
+        if (
+            !name ||
+            typeof name !== 'string' ||
+            !type ||
+            typeof type !== 'string' ||
+            !description ||
+            typeof description !== 'string' ||
+            !visitDuration ||
+            typeof visitDuration !== 'string'
+        ) {
+            res.status(HTTP_STATUS.BAD_REQUEST).json({
+                message:
+                    'Body should include name, type, description, visitDuration all as strings',
+            });
+        }
 
-    /*  Add the new attraction to the already defined
+        /*  Add the new attraction to the already defined
         attractions with an incremented id  */
-    const newAttraction = {
-        id: nextAttractionId,
-        destinationId,
-        name,
-        type,
-        description,
-        visitDuration,
-    };
-    attractions.push(newAttraction);
-    nextAttractionId++;
+        const newAttraction = {
+            id: nextAttractionId,
+            destinationId,
+            name,
+            type,
+            description,
+            visitDuration,
+        };
+        attractions.push(newAttraction);
+        nextAttractionId++;
 
-    /*  Return with 201 Created with the newly created
+        /*  Return with 201 Created with the newly created
         attraction in the response */
-    res.status(HTTP_STATUS.CREATED).json(newAttraction);
-});
+        res.status(HTTP_STATUS.CREATED).json(newAttraction);
+    },
+);
 
 /*NOTE: Never hand in anything like the following, but this could be helpful 
 in development to detecting issues with your endpoints*/

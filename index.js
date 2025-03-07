@@ -26,7 +26,10 @@ app.use(bodyParser.json());
 app.use(cors());
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    res.header(
+        'Access-Control-Allow-Headers',
+        'Origin, X-Requested-With, Content-Type, Accept',
+    );
     next();
 });
 
@@ -69,9 +72,14 @@ app.get(apiPath + version + '/songs', (req, res) => {
 /* 2. Create a new song */
 app.post(apiPath + version + '/songs', (req, res) => {
     // Check if request body contains required fields
-    if (req.body === undefined || req.body.title === undefined || req.body.artist === undefined) {
+    if (
+        req.body === undefined ||
+        req.body.title === undefined ||
+        req.body.artist === undefined
+    ) {
         return res.status(HTTP_STATUS.BAD_REQUEST).json({
-            message: 'Title and artist fields are required in the request body.',
+            message:
+                'Title and artist fields are required in the request body.',
         });
     }
     // Check if song already exists in the songs list
