@@ -18,3 +18,8 @@
 	- [ ] `POST /playlists`
 4. **Add song to** an existing playlist
 	- [ ] `POST /playlists/{id}/songIds`
+
+# Git message format:
+Title that is less than 50 characters preferably.
+
+Body of the message after 2 newlines as you can see, this body can be as looooong as you want yayyyyy.
