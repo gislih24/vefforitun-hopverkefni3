@@ -14,6 +14,10 @@ const apiPath = '/api/';
 const version = 'v1';
 const port = 3000;
 
+const HTTP_STATUS = {
+    OK: 200,
+};
+
 /* Set Cors-related headers to prevent blocking of local requests */
 app.use(bodyParser.json());
 app.use(cors());
@@ -44,6 +48,10 @@ const playlists = [
     { id: 2, name: 'Workout Playlist', songIds: [2, 5, 6] },
     { id: 3, name: 'Lo-Fi Study', songIds: [] },
 ];
+
+app.get('/songs', (req, res) => {
+    res.status(HTTP_STATUS.OK).json(songs);
+});
 
 /*  Our id counters
     We use basic integer ids in this assignment, but other solutions (such as UUIDs) would be better. */
