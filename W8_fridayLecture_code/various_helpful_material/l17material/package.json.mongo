@@ -1,0 +1,17 @@
+{
+  "name": "l15material",
+  "version": "1.0.0",
+  "description": "",
+  "main": "todosPlain.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node todosMongo.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "mongodb": "^3.1.13"
+  }
+}

@@ -1,0 +1,96 @@
+{
+	"info": {
+		"_postman_id": "20282532-f6ef-44e6-ac83-4d2ecef57e0b",
+		"name": "Travel API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "41966759"
+	},
+	"item": [
+		{
+			"name": "Get all destinations",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/v1/destinations",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"destinations"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all attractions",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/v1/attractions",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"attractions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create a new attraction",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Leaning Tower of Pisa\",\r\n    \"type\": \"Historical Landmark\",\r\n    \"description\": \"Famous leaning bell tower in Pisa, Italy.\",\r\n    \"visitDuration\": \"1-2 hours\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/v1/destinations/:destinationId/attractions",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"destinations",
+						":destinationId",
+						"attractions"
+					],
+					"variable": [
+						{
+							"key": "destinationId",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
