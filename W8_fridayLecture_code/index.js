@@ -13,6 +13,12 @@ const apiPath = '/api/';
 const version = 'v1';
 const port = 3000;
 
+const HTTP_STATUS = {
+    OK: 200,
+    BAD_REQUEST: 400,
+    CREATED: 201,
+};
+
 // Tell express to use the body parser module
 app.use(bodyParser.json());
 
@@ -104,7 +110,7 @@ Output:
         }
       ] */
 app.get(apiPath + version + '/destinations', (req, res) => {
-    res.status(200).json(destinations);
+    res.status(HTTP_STATUS.OK).json(destinations);
 });
 
 /* Read all attractions 
@@ -135,7 +141,7 @@ Output:
         }
       ] */
 app.get(apiPath + version + '/attractions', (req, res) => {
-    res.status(200).json(attractions);
+    res.status(HTTP_STATUS.OK).json(attractions);
 });
 
 /* Create a new attraction 
@@ -169,7 +175,7 @@ app.post(apiPath + version + '/destinations/:destinationId/attractions', (req, r
     const destinationId = Number(req.params.destinationId);
     /*  Check that destinationId is a number */
     if (isNaN(destinationId)) {
-        return res.status(400).json({
+        return res.status(HTTP_STATUS.BAD_REQUEST).json({
             message: 'Invalid destinationId, it must be a number.',
         });
     }
@@ -180,7 +186,7 @@ app.post(apiPath + version + '/destinations/:destinationId/attractions', (req, r
         (destination) => destination.id === destinationId,
     );
     if (destinationIndex < 0) {
-        res.status(400).json({
+        res.status(HTTP_STATUS.BAD_REQUEST).json({
             message: `Destination with id ${destinationId} does not exist.`,
         });
     }
@@ -198,7 +204,7 @@ app.post(apiPath + version + '/destinations/:destinationId/attractions', (req, r
         !visitDuration ||
         typeof visitDuration !== 'string'
     ) {
-        res.status(400).json({
+        res.status(HTTP_STATUS.BAD_REQUEST).json({
             message: 'Body should include name, type, description, visitDuration all as strings',
         });
     }
@@ -218,7 +224,7 @@ app.post(apiPath + version + '/destinations/:destinationId/attractions', (req, r
 
     /*  Return with 201 Created with the newly created
         attraction in the response */
-    res.status(201).json(newAttraction);
+    res.status(HTTP_STATUS.CREATED).json(newAttraction);
 });
 
 /*NOTE: Never hand in anything like the following, but this could be helpful 
