@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "2b67cfd0-fe9b-4744-a4a6-d9d097703aaa",
+		"_postman_id": "6449310e-018f-4aea-9aa7-1992f502c96a",
 		"name": "Song API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "42331445"
+		"_exporter_id": "42333608"
 	},
 	"item": [
 		{
@@ -25,6 +25,30 @@
 						"api",
 						"v1",
 						"songs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get-all-playlists",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/v1/get-all-playlists",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"get-all-playlists"
 					]
 				}
 			},
