@@ -18,6 +18,7 @@ const HTTP_STATUS = {
     OK: 200,
     CREATED: 201,
     BAD_REQUEST: 400,
+    NOT_FOUND: 404,
     CONFLICT: 409,
 };
 
@@ -84,11 +85,17 @@ app.post(apiPath + version + '/songs', (req, res) => {
     }
     // Check if song already exists in the songs list
     // TODO: get this to work
-    // if (songs.some((song) => song.title === req.body.title)) {
-    //     return res.status(HTTP_STATUS.CONFLICT).json({
-    //         message: 'Song already exists',
-    //     });
-    // }
+    if (
+        songs.some(
+            (song) =>
+                song.title === req.body.title &&
+                song.artist === req.body.artist,
+        )
+    ) {
+        return res.status(HTTP_STATUS.CONFLICT).json({
+            message: 'Song already exists',
+        });
+    }
     // Create new song object and add it to the songs array
     const newSong = {
         title: req.body.title,
@@ -99,6 +106,7 @@ app.post(apiPath + version + '/songs', (req, res) => {
     nextSongId++;
     return res.status(HTTP_STATUS.CREATED).json(newSong);
 });
+/* 3. Partially update a song */
 
 /* --------------------------
 
@@ -107,24 +115,20 @@ app.post(apiPath + version + '/songs', (req, res) => {
 -------------------------- */
 
 app.get(apiPath + version + '/playlists/:id', (req, res) => {
-    
-    const playlistId = req.params.id
-    
-    const playlist = playlists.find(pl => pl.id === playlistId);
-    
+    const playlistId = req.params.id;
+
+    const playlist = playlists.find((pl) => pl.id === playlistId);
+
     if (!playlist) {
         return res.status(HTTP_STATUS.NOT_FOUND).json({
-            error: 'Playlist not found'
+            error: 'Playlist not found',
         });
     }
-    
+
     res.status(HTTP_STATUS.OK).json(playlist);
 });
 
 app.get(apiPath + version + '/playlists', (req, res) => {
-    
-    
-
     res.status(HTTP_STATUS.OK).json(playlists);
 });
 
