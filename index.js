@@ -1,3 +1,4 @@
+// frontend link: https://2025-veff-assignment3-group1.netlify.app/
 const express = require('express');
 
 /* Import a body parser module to be able to access the request body as json */
