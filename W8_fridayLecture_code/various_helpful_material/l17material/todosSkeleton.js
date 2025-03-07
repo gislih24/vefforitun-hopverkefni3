@@ -4,8 +4,8 @@ const app = express();
 const port = 3000;
 
 const HTTP_STATUS = {
-	OK: 200,
-	METHOD_NOT_ALLOWED: 405
+    OK: 200,
+    METHOD_NOT_ALLOWED: 405,
 };
 
 app.get('/', (req, res) => {

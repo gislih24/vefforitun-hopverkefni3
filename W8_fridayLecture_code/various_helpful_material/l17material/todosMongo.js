@@ -55,7 +55,9 @@ let notes = [
 ];
 
 app.use(function (req, res, next) {
-    console.log('Request: ' + req.method + ' at ' + req.url + ', time: ' + new Date());
+    console.log(
+        'Request: ' + req.method + ' at ' + req.url + ', time: ' + new Date(),
+    );
     res.set('X-Logged', 'true');
     next();
 });
@@ -66,7 +68,9 @@ app.get('/users', (req, res) => {
         .find({})
         .toArray(function (err, users) {
             if (err) {
-                return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: 'Error when accessing DB.' });
+                return res
+                    .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
+                    .json({ message: 'Error when accessing DB.' });
             }
             res.status(HTTP_STATUS.OK).json(users);
         });
@@ -77,7 +81,8 @@ app.get('/users/:userId', (req, res) => {
     db.collection('users').findOne({ _id: id }, function (err, user) {
         if (err || user === null) {
             return res.status(HTTP_STATUS.NOT_FOUND).json({
-                message: 'User with id ' + req.params.userId + ' does not exist.',
+                message:
+                    'User with id ' + req.params.userId + ' does not exist.',
             });
         } else {
             res.status(HTTP_STATUS.OK).json(user);
@@ -86,7 +91,11 @@ app.get('/users/:userId', (req, res) => {
 });
 
 app.post('/users', (req, res) => {
-    if (req.body === undefined || req.body.username === undefined || req.body.age === undefined) {
+    if (
+        req.body === undefined ||
+        req.body.username === undefined ||
+        req.body.age === undefined
+    ) {
         res.status(HTTP_STATUS.BAD_REQUEST).json({
             message: 'username and age fields are required in the request body',
         });
@@ -94,7 +103,9 @@ app.post('/users', (req, res) => {
         let newUser = { username: req.body.username, age: req.body.age };
         db.collection('users').insertOne(newUser, function (err, user) {
             if (err) {
-                return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: 'Error when writing user.' });
+                return res
+                    .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
+                    .json({ message: 'Error when writing user.' });
             }
             res.status(HTTP_STATUS.CREATED).json(user.ops[0]);
             return;
@@ -103,7 +114,11 @@ app.post('/users', (req, res) => {
 });
 
 app.put('/users/:userId', (req, res) => {
-    if (req.body === undefined || req.body.username === undefined || req.body.age === undefined) {
+    if (
+        req.body === undefined ||
+        req.body.username === undefined ||
+        req.body.age === undefined
+    ) {
         res.status(HTTP_STATUS.BAD_REQUEST).json({
             message: 'username and age fields are required in the request body',
         });
@@ -112,22 +127,33 @@ app.put('/users/:userId', (req, res) => {
         let newValues = {
             $set: { username: req.body.username, age: req.body.age },
         };
-        db.collection('users').findOneAndUpdate({ _id: id }, newValues, function (err, user) {
-            if (err || user === null || user.value === null) {
-                res.status(HTTP_STATUS.NOT_FOUND).json({
-                    message: 'User with id ' + req.params.userId + ' does not exist.',
-                });
-            } else {
-                res.status(HTTP_STATUS.OK).json(user.value);
-            }
-        });
+        db.collection('users').findOneAndUpdate(
+            { _id: id },
+            newValues,
+            function (err, user) {
+                if (err || user === null || user.value === null) {
+                    res.status(HTTP_STATUS.NOT_FOUND).json({
+                        message:
+                            'User with id ' +
+                            req.params.userId +
+                            ' does not exist.',
+                    });
+                } else {
+                    res.status(HTTP_STATUS.OK).json(user.value);
+                }
+            },
+        );
     }
 });
 
 app.patch('/users/:userId', (req, res) => {
-    if (req.body === undefined || (req.body.username === undefined && req.body.age === undefined)) {
+    if (
+        req.body === undefined ||
+        (req.body.username === undefined && req.body.age === undefined)
+    ) {
         res.status(HTTP_STATUS.BAD_REQUEST).json({
-            message: 'Either username or age field is required in the request body',
+            message:
+                'Either username or age field is required in the request body',
         });
     } else {
         for (let i = 0; i < users.length; i++) {
@@ -155,7 +181,9 @@ app.delete('/users', (req, res) => {
         .toArray(function (err, users) {
             db.collection('users').deleteMany({}, function (err, obj) {
                 if (err || obj === null || obj.result.ok !== 1) {
-                    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: 'Deletion failed with error: ' + err });
+                    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+                        message: 'Deletion failed with error: ' + err,
+                    });
                 } else {
                     res.status(HTTP_STATUS.OK).json(users);
                 }
@@ -168,7 +196,8 @@ app.delete('/users/:userId', (req, res) => {
     db.collection('users').findOneAndDelete({ _id: id }, function (err, obj) {
         if (err || obj === null || obj.value === null) {
             res.status(HTTP_STATUS.NOT_FOUND).json({
-                message: 'User with id ' + req.params.userId + ' does not exist.',
+                message:
+                    'User with id ' + req.params.userId + ' does not exist.',
             });
         } else {
             res.status(HTTP_STATUS.OK).json(obj.value);
@@ -184,7 +213,9 @@ app.get('/users/:userId/notes', (req, res) => {
             return;
         }
     }
-    res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'User with id ' + req.params.userId + 'does not exist.' });
+    res.status(HTTP_STATUS.NOT_FOUND).json({
+        message: 'User with id ' + req.params.userId + 'does not exist.',
+    });
 });
 
 app.get('/users/:userId/notes/:noteId', (req, res) => {
@@ -206,17 +237,24 @@ app.get('/users/:userId/notes/:noteId', (req, res) => {
             return;
         }
     }
-    res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'User with id ' + req.params.userId + ' does not exist' });
+    res.status(HTTP_STATUS.NOT_FOUND).json({
+        message: 'User with id ' + req.params.userId + ' does not exist',
+    });
 });
 
 app.post('/users/:userId/notes', (req, res) => {
-    res.status(HTTP_STATUS.OK).json({ message: 'Post a new note for user with id ' + req.params.userId });
+    res.status(HTTP_STATUS.OK).json({
+        message: 'Post a new note for user with id ' + req.params.userId,
+    });
 });
 
 app.put('/users/:userId/notes/:noteId', (req, res) => {
     res.status(HTTP_STATUS.OK).json({
         message:
-            'Update note with id ' + req.params.noteId + ' for user with id ' + req.params.userId,
+            'Update note with id ' +
+            req.params.noteId +
+            ' for user with id ' +
+            req.params.userId,
     });
 });
 
@@ -225,7 +263,9 @@ app.delete('/users/:userId/notes/:noteId', (req, res) => {
         if (notes[i].userId == req.params.userId) {
             for (let j = 0; j < notes[i].userNotes.length; j++) {
                 if (notes[i].userNotes[j].id == req.params.noteId) {
-                    res.status(HTTP_STATUS.OK).json(notes[i].userNotes.splice(j, 1));
+                    res.status(HTTP_STATUS.OK).json(
+                        notes[i].userNotes.splice(j, 1),
+                    );
                     return;
                 }
             }
@@ -239,7 +279,9 @@ app.delete('/users/:userId/notes/:noteId', (req, res) => {
             return;
         }
     }
-    res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'User with id ' + req.params.userId + ' does not exist' });
+    res.status(HTTP_STATUS.NOT_FOUND).json({
+        message: 'User with id ' + req.params.userId + ' does not exist',
+    });
 });
 
 app.delete('/users/:userId/notes', (req, res) => {
@@ -251,7 +293,9 @@ app.delete('/users/:userId/notes', (req, res) => {
             return;
         }
     }
-    res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'User with id ' + req.params.userId + ' does not exist' });
+    res.status(HTTP_STATUS.NOT_FOUND).json({
+        message: 'User with id ' + req.params.userId + ' does not exist',
+    });
 });
 
 app.get('/notes', (req, res) => {

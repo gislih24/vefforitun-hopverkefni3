@@ -1,6 +1,6 @@
 module.exports = {
     // Core formatting rules
-    printWidth: 100, // Modern screens can handle slightly longer lines.
+    printWidth: 80, // Modern screens can handle slightly longer lines.
     tabWidth: 4, // Standard for JavaScript ecosystems.
     useTabs: false, // Spaces are dominant in the JS community.
     semi: true, // Required for ASI safety.

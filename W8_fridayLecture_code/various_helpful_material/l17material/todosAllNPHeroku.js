@@ -58,7 +58,11 @@ app.get('/users/:userId', (req, res) => {
 });
 
 app.post('/users', (req, res) => {
-    if (req.body === undefined || req.body.username === undefined || req.body.age === undefined) {
+    if (
+        req.body === undefined ||
+        req.body.username === undefined ||
+        req.body.age === undefined
+    ) {
         res.status(HTTP_STATUS.BAD_REQUEST).json({
             message: 'username and age fields are required in the request body',
         });
@@ -77,7 +81,11 @@ app.post('/users', (req, res) => {
 });
 
 app.put('/users/:userId', (req, res) => {
-    if (req.body === undefined || req.body.username === undefined || req.body.age === undefined) {
+    if (
+        req.body === undefined ||
+        req.body.username === undefined ||
+        req.body.age === undefined
+    ) {
         res.status(HTTP_STATUS.BAD_REQUEST).json({
             message: 'username and age fields are required in the request body',
         });
@@ -97,9 +105,13 @@ app.put('/users/:userId', (req, res) => {
 });
 
 app.patch('/users/:userId', (req, res) => {
-    if (req.body === undefined || (req.body.username === undefined && req.body.age === undefined)) {
+    if (
+        req.body === undefined ||
+        (req.body.username === undefined && req.body.age === undefined)
+    ) {
         res.status(HTTP_STATUS.BAD_REQUEST).json({
-            message: 'Either username or age field is required in the request body',
+            message:
+                'Either username or age field is required in the request body',
         });
     } else {
         for (let i = 0; i < users.length; i++) {
@@ -146,7 +158,9 @@ app.get('/users/:userId/notes', (req, res) => {
             return;
         }
     }
-    res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'User with id ' + req.params.userId + 'does not exist.' });
+    res.status(HTTP_STATUS.NOT_FOUND).json({
+        message: 'User with id ' + req.params.userId + 'does not exist.',
+    });
 });
 
 app.get('/users/:userId/notes/:noteId', (req, res) => {
@@ -168,11 +182,17 @@ app.get('/users/:userId/notes/:noteId', (req, res) => {
             return;
         }
     }
-    res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'User with id ' + req.params.userId + ' does not exist' });
+    res.status(HTTP_STATUS.NOT_FOUND).json({
+        message: 'User with id ' + req.params.userId + ' does not exist',
+    });
 });
 
 app.post('/users/:userId/notes', (req, res) => {
-    if (req.body === undefined || req.body.name === undefined || req.body.content === undefined) {
+    if (
+        req.body === undefined ||
+        req.body.name === undefined ||
+        req.body.content === undefined
+    ) {
         res.status(HTTP_STATUS.BAD_REQUEST).json({
             message: 'name and content fields are required in the request body',
         });
@@ -197,7 +217,11 @@ app.post('/users/:userId/notes', (req, res) => {
 });
 
 app.put('/users/:userId/notes/:noteId', (req, res) => {
-    if (req.body === undefined || req.body.name === undefined || req.body.content === undefined) {
+    if (
+        req.body === undefined ||
+        req.body.name === undefined ||
+        req.body.content === undefined
+    ) {
         res.status(HTTP_STATUS.BAD_REQUEST).json({
             message: 'name and content fields are required in the request body',
         });
@@ -208,12 +232,15 @@ app.put('/users/:userId/notes/:noteId', (req, res) => {
                     if (notes[i].userNotes[j].id == req.params.noteId) {
                         notes[i].userNotes[j].name = req.body.name;
                         notes[i].userNotes[j].content = req.body.content;
-                        res.status(HTTP_STATUS.CREATED).json(notes[i].userNotes[j]);
+                        res.status(HTTP_STATUS.CREATED).json(
+                            notes[i].userNotes[j],
+                        );
                         return;
                     }
                 }
                 res.status(HTTP_STATUS.NOT_FOUND).json({
-                    message: 'Note with id ' + req.params.noteId + ' does not exist',
+                    message:
+                        'Note with id ' + req.params.noteId + ' does not exist',
                 });
                 return;
             }
@@ -229,7 +256,9 @@ app.delete('/users/:userId/notes/:noteId', (req, res) => {
         if (notes[i].userId == req.params.userId) {
             for (let j = 0; j < notes[i].userNotes.length; j++) {
                 if (notes[i].userNotes[j].id == req.params.noteId) {
-                    res.status(HTTP_STATUS.OK).json(notes[i].userNotes.splice(j, 1));
+                    res.status(HTTP_STATUS.OK).json(
+                        notes[i].userNotes.splice(j, 1),
+                    );
                     return;
                 }
             }
@@ -243,7 +272,9 @@ app.delete('/users/:userId/notes/:noteId', (req, res) => {
             return;
         }
     }
-    res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'User with id ' + req.params.userId + ' does not exist' });
+    res.status(HTTP_STATUS.NOT_FOUND).json({
+        message: 'User with id ' + req.params.userId + ' does not exist',
+    });
 });
 
 app.delete('/users/:userId/notes', (req, res) => {
@@ -255,7 +286,9 @@ app.delete('/users/:userId/notes', (req, res) => {
             return;
         }
     }
-    res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'User with id ' + req.params.userId + ' does not exist' });
+    res.status(HTTP_STATUS.NOT_FOUND).json({
+        message: 'User with id ' + req.params.userId + ' does not exist',
+    });
 });
 
 app.get('/notes', (req, res) => {
