@@ -100,7 +100,7 @@ app.post(apiPath + version + '/songs', (req, res) => {
 
 app.get(apiPath + version + '/playlists/:id', (req, res) => {
     
-    const playlistId = req.params.id
+    const playlistId = parseInt(req.params.id)
     
     const playlist = playlists.find(pl => pl.id === playlistId);
     
@@ -109,13 +109,17 @@ app.get(apiPath + version + '/playlists/:id', (req, res) => {
             error: 'Playlist not found'
         });
     }
-    
+
+    playlist.songIds = playlist.songIds.map(songId => {
+      const song = songs.find(s => s.id === songId);
+      return song;
+    })
+    .filter(songId => songId !== null);
+
     res.status(HTTP_STATUS.OK).json(playlist);
 });
 
 app.get(apiPath + version + '/playlists', (req, res) => {
-    
-    
 
     res.status(HTTP_STATUS.OK).json(playlists);
 });
