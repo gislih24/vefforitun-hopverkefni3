@@ -197,7 +197,7 @@
 				"method": "POST",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3000/api/v1/playlists/:id/songIds",
+					"raw": "http://localhost:3000/api/v1/playlists/:id",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -207,8 +207,7 @@
 						"api",
 						"v1",
 						"playlists",
-						":id",
-						"songIds"
+						":id"
 					],
 					"variable": [
 						{
