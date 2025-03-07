@@ -55,7 +55,7 @@
 			"response": []
 		},
 		{
-			"name": "Partially update",
+			"name": "Partially update a song",
 			"request": {
 				"auth": {
 					"type": "noauth"

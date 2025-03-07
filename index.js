@@ -49,7 +49,7 @@ const playlists = [
     { id: 3, name: 'Lo-Fi Study', songIds: [] },
 ];
 
-app.get('/songs', (req, res) => {
+app.get(apiPath + version + '/songs', (req, res) => {
     res.status(HTTP_STATUS.OK).json(songs);
 });
 
