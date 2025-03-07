@@ -16,7 +16,9 @@ const port = 3000;
 
 const HTTP_STATUS = {
     OK: 200,
+    CREATED: 201,
     BAD_REQUEST: 400,
+    CONFLICT: 409,
 };
 
 /* Set Cors-related headers to prevent blocking of local requests */
@@ -49,8 +51,16 @@ const playlists = [
     { id: 2, name: 'Workout Playlist', songIds: [2, 5, 6] },
     { id: 3, name: 'Lo-Fi Study', songIds: [] },
 ];
+/*  Our id counters
+    We use basic integer ids in this assignment, but other solutions (such as UUIDs) would be better. */
+let nextSongId = 9;
+let nextPlaylistId = 4;
 /* --------------------------------ENDPOINTS-------------------------------- */
-/* ----------------SONGS---------------- */
+/* --------------------------
+
+        SONGS ENDPOINTS     
+
+-------------------------- */
 /* 1. Read all songs */
 app.get(apiPath + version + '/songs', (req, res) => {
     res.status(HTTP_STATUS.OK).json(songs);
@@ -58,24 +68,29 @@ app.get(apiPath + version + '/songs', (req, res) => {
 
 /* 2. Create a new song */
 app.post(apiPath + version + '/songs', (req, res) => {
-    const { title, artist } = req.body;
-    const destinationId = Number(req.params.destinationId);
-    if (isNaN(destinationId)) {
+    // Check if request body contains required fields
+    if (req.body === undefined || req.body.title === undefined || req.body.artist === undefined) {
         return res.status(HTTP_STATUS.BAD_REQUEST).json({
-            message: 'Invalid destinationId, it must be a number.',
-        })
+            message: 'Title and artist fields are required in the request body.',
+        });
     }
+    // Check if song already exists in the songs list
+    // TODO: get this to work
+    // if (songs.some((song) => song.title === req.body.title)) {
+    //     return res.status(HTTP_STATUS.CONFLICT).json({
+    //         message: 'Song already exists',
+    //     });
+    // }
+    // Create new song object and add it to the songs array
+    const newSong = {
+        title: req.body.title,
+        artist: req.body.artist,
+        id: nextSongId,
+    };
+    songs.push(newSong);
+    nextSongId++;
+    return res.status(HTTP_STATUS.CREATED).json(newSong);
 });
-/*  Our id counters
-    We use basic integer ids in this assignment, but other solutions (such as UUIDs) would be better. */
-let nextSongId = 9;
-let nextPlaylistId = 4;
-
-/* --------------------------
-
-        SONGS ENDPOINTS     
-
--------------------------- */
 
 /* --------------------------
 

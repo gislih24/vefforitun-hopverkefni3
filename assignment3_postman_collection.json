@@ -30,30 +30,39 @@
 			},
 			"response": []
 		},
-		{
-			"name": "Create new song",
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "POST",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:3000/api/v1/songs",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"api",
-						"v1",
-						"songs"
-					]
-				}
-			},
-			"response": []
-		},
+        {
+            "name": "Create new song",
+            "request": {
+                "auth": {
+                    "type": "noauth"
+                },
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\"title\": \"Your Song Title\", \"artist\": \"Artist Name\"}"
+                },
+                "url": {
+                    "raw": "http://localhost:3000/api/v1/songs",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000",
+                    "path": [
+                        "api",
+                        "v1",
+                        "songs"
+                    ]
+                }
+            },
+            "response": []
+        },
 		{
 			"name": "Partially update a song",
 			"request": {
