@@ -16,6 +16,7 @@ const port = 3000;
 
 const HTTP_STATUS = {
     OK: 200,
+    BAD_REQUEST: 400,
 };
 
 /* Set Cors-related headers to prevent blocking of local requests */
@@ -48,11 +49,23 @@ const playlists = [
     { id: 2, name: 'Workout Playlist', songIds: [2, 5, 6] },
     { id: 3, name: 'Lo-Fi Study', songIds: [] },
 ];
-
+/* --------------------------------ENDPOINTS-------------------------------- */
+/* ----------------SONGS---------------- */
+/* 1. Read all songs */
 app.get(apiPath + version + '/songs', (req, res) => {
     res.status(HTTP_STATUS.OK).json(songs);
 });
 
+/* 2. Create a new song */
+app.post(apiPath + version + '/songs', (req, res) => {
+    const { title, artist } = req.body;
+    const destinationId = Number(req.params.destinationId);
+    if (isNaN(destinationId)) {
+        return res.status(HTTP_STATUS.BAD_REQUEST).json({
+            message: 'Invalid destinationId, it must be a number.',
+        })
+    }
+});
 /*  Our id counters
     We use basic integer ids in this assignment, but other solutions (such as UUIDs) would be better. */
 let nextSongId = 9;
