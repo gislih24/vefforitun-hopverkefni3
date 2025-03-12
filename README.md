@@ -4,7 +4,7 @@
 1. **Read** all songs
 	- [x] `GET /songs`
 2. **Create** a new song
-	- [ ] `POST /songs`
+	- [x] `POST /songs`
 3. **Partially update** a song
 	- [ ] `PATCH /songs`
 4. **Delete** a song

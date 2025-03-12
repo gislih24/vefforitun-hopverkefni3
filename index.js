@@ -65,6 +65,7 @@ let nextPlaylistId = 4;
         SONGS ENDPOINTS     
 
 -------------------------- */
+// MARK: Songs
 /* 1. Read all songs */
 app.get(apiPath + version + '/songs', (req, res) => {
     res.status(HTTP_STATUS.OK).json(songs);
@@ -84,7 +85,6 @@ app.post(apiPath + version + '/songs', (req, res) => {
         });
     }
     // Check if song already exists in the songs list
-    // TODO: get this to work
     if (
         songs.some(
             (song) =>
@@ -106,6 +106,7 @@ app.post(apiPath + version + '/songs', (req, res) => {
     nextSongId++;
     return res.status(HTTP_STATUS.CREATED).json(newSong);
 });
+
 /* 3. Partially update a song */
 
 /* --------------------------
@@ -113,7 +114,8 @@ app.post(apiPath + version + '/songs', (req, res) => {
       PLAYLISTS ENDPOINTS    
 
 -------------------------- */
-
+// MARK: Playlists
+/* 1. Read all playlists */
 app.get(apiPath + version + '/playlists/:id', (req, res) => {
     
     const playlistId = parseInt(req.params.id)
@@ -135,10 +137,14 @@ app.get(apiPath + version + '/playlists/:id', (req, res) => {
     res.status(HTTP_STATUS.OK).json(playlist);
 });
 
+/* 2. Read a specific playlist */
 app.get(apiPath + version + '/playlists', (req, res) => {
 
     res.status(HTTP_STATUS.OK).json(playlists);
 });
+/* 3. Create a new playlist */
+
+/* 4. Add song to an existing playlist */
 
 /* --------------------------
 
