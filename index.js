@@ -140,15 +140,20 @@ app.patch(apiPath + version + '/songs/:songId', (req, res) => {
 
 /* 4. Delete a song */
 app.delete(apiPath + version + '/songs/:songId', (req, res) => {
-    // TODO: Update songs inside of playlists as well
-    const index = songs.findIndex((song) => song.id == req.params.songId);
-    if (index === -1) {
+    const songId = parseInt(req.params.songId, 10);
+    const songIndex = songs.findIndex((song) => song.id === songId);
+    if (songIndex === -1) {
         return res.status(HTTP_STATUS.NOT_FOUND).json({
-            message: 'Song with id ' + req.params.songId + ' does not exist.',
+            message: `Song with id ${songId} does not exist.`,
         });
     }
-    const deletedSong = songs.splice(index, 1);
-    return res.status(HTTP_STATUS.OK).json(deletedSong);
+    // Removes reference to the song id from all playlists
+    playlists.forEach((playlist) => {
+        playlist.songIds = playlist.songIds.filter((id) => id !== songId);
+    });
+    // Delete the song from the songs array
+    const deletedSongs = songs.splice(songIndex, 1);
+    return res.status(HTTP_STATUS.OK).json(deletedSongs[0]);
 });
 
 /* --------------------------
