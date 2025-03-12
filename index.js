@@ -193,6 +193,41 @@ app.get(apiPath + version + '/playlists/:id', (req, res) => {
 // MARK: Create a new playlists
 /* 3. Create a new playlist */
 
+app.post(apiPath + version + '/playlists', (req, res) => {
+    // Check if request body contains required fields
+    if (
+        req.body === undefined ||
+        req.body.id === undefined ||
+        req.body.name === undefined ||
+        req.body.songIds === undefined
+    ) {
+        return res.status(HTTP_STATUS.BAD_REQUEST).json({
+            message:
+                'Id, name and songsId fields are required in the request body.',
+        });
+    }
+    // Check if playlist already exists in the playlist list
+    if (
+        playlists.some(
+            (playlist) =>
+                playlist.name === req.body.name
+        )
+    ) {
+        return res.status(HTTP_STATUS.CONFLICT).json({
+            message: 'Playlist already exists',
+        });
+    }
+    // Create new song object and add it to the songs array
+    const newPlaylist = {
+        id: nextPlaylistId,
+        name: req.body.name,
+        songIds: [],
+    };
+    songs.push(newPlaylist);
+    nextPlaylistId++;
+    return res.status(HTTP_STATUS.CREATED).json(newPlaylist);
+});
+
 // MARK: Add song to an existing playlist
 /* 4. Add song to an existing playlist */
 
