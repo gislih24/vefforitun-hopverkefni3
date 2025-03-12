@@ -65,6 +65,7 @@ let nextPlaylistId = 4;
         SONGS ENDPOINTS     
 
 -------------------------- */
+// MARK: Songs
 /* 1. Read all songs */
 app.get(apiPath + version + '/songs', (req, res) => {
     res.status(HTTP_STATUS.OK).json(songs);
@@ -84,7 +85,6 @@ app.post(apiPath + version + '/songs', (req, res) => {
         });
     }
     // Check if song already exists in the songs list
-    // TODO: get this to work
     if (
         songs.some(
             (song) =>
@@ -106,39 +106,72 @@ app.post(apiPath + version + '/songs', (req, res) => {
     nextSongId++;
     return res.status(HTTP_STATUS.CREATED).json(newSong);
 });
+
 /* 3. Partially update a song */
+app.patch(apiPath + version + '/songs', (req, res) => {
+    // Check that at least one field (title or artist) is provided
+    if (
+        req.body === undefined ||
+        (req.body.title === undefined && req.body.artist === undefined)
+    ) {
+        return res.status(HTTP_STATUS.BAD_REQUEST).json({
+            message:
+                'Either title or artist field is required in the request body',
+        });
+    }
+
+    const song = songs.find((song) => song.id == req.params.songId);
+    // If the song is not found in the array, return an error.
+    if (!song) {
+        return res.status(HTTP_STATUS.NOT_FOUND).json({
+            message: 'Song with id ' + req.params.songId + ' does not exist.',
+        });
+    }
+
+    // Update the fields that were provided
+    if (req.body.title !== undefined) {
+        song.title = req.body.title;
+    }
+    if (req.body.artist !== undefined) {
+        song.artist = req.body.artist;
+    }
+    return res.status(HTTP_STATUS.OK).json(song);
+});
+
+/* 4. Delete a song */
 
 /* --------------------------
 
       PLAYLISTS ENDPOINTS    
 
 -------------------------- */
-
+// MARK: Playlists
+/* 1. Read all playlists */
 app.get(apiPath + version + '/playlists/:id', (req, res) => {
-    
-    const playlistId = parseInt(req.params.id)
-    
-    const playlist = playlists.find(pl => pl.id === playlistId);
-    
+    const playlistId = parseInt(req.params.id);
+
+    const playlist = playlists.find((pl) => pl.id === playlistId);
     if (!playlist) {
         return res.status(HTTP_STATUS.NOT_FOUND).json({
             error: 'Playlist not found',
         });
     }
-
-    playlist.songIds = playlist.songIds.map(songId => {
-      const song = songs.find(s => s.id() === songId);
-      return song;
-    })
-    .filter(songId => songId !== null);
-
+    playlist.songIds = playlist.songIds
+        .map((songId) => {
+            const song = songs.find((s) => s.id === songId);
+            return song;
+        })
+        .filter((songId) => songId !== null);
     res.status(HTTP_STATUS.OK).json(playlist);
 });
 
+/* 2. Read a specific playlist */
 app.get(apiPath + version + '/playlists', (req, res) => {
-
     res.status(HTTP_STATUS.OK).json(playlists);
 });
+/* 3. Create a new playlist */
+
+/* 4. Add song to an existing playlist */
 
 /* --------------------------
 
