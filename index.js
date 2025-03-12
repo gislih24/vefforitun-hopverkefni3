@@ -127,7 +127,7 @@ app.get(apiPath + version + '/playlists/:id', (req, res) => {
     }
 
     playlist.songIds = playlist.songIds.map(songId => {
-      const song = songs.find(s => s.id === songId);
+      const song = songs.find(s => s.id() === songId);
       return song;
     })
     .filter(songId => songId !== null);
