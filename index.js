@@ -156,8 +156,16 @@ app.delete(apiPath + version + '/songs/:songId', (req, res) => {
       PLAYLISTS ENDPOINTS    
 
 -------------------------- */
-// MARK: Playlists
+// MARK: Read all playlists
 /* 1. Read all playlists */
+
+app.get(apiPath + version + '/playlists', (req, res) => {
+    res.status(HTTP_STATUS.OK).json(playlists);
+});
+
+// MARK: Read a specific playlists
+/* 2. Read a specific playlist */
+
 app.get(apiPath + version + '/playlists/:id', (req, res) => {
     const playlistId = parseInt(req.params.id);
 
@@ -168,20 +176,16 @@ app.get(apiPath + version + '/playlists/:id', (req, res) => {
         });
     }
     playlist.songIds = playlist.songIds
-        .map((songId) => {
-            const song = songs.find((s) => s.id === songId);
-            return song;
-        })
-        .filter((songId) => songId !== null);
+        .map(songId => songs.find(song => song.id === songId))
+        .filter(Boolean);
     res.status(HTTP_STATUS.OK).json(playlist);
+    return playlist.songIds
 });
 
-/* 2. Read a specific playlist */
-app.get(apiPath + version + '/playlists', (req, res) => {
-    res.status(HTTP_STATUS.OK).json(playlists);
-});
+// MARK: Create a new playlists
 /* 3. Create a new playlist */
 
+// MARK: Add song to an existing playlist
 /* 4. Add song to an existing playlist */
 
 /* --------------------------
