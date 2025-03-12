@@ -167,20 +167,27 @@ app.get(apiPath + version + '/playlists', (req, res) => {
 /* 2. Read a specific playlist */
 
 app.get(apiPath + version + '/playlists/:id', (req, res) => {
-    const playlistId = parseInt(req.params.id);
-
+    const playlistId = parseInt(req.params.id, 10);
     const playlist = playlists.find((pl) => pl.id === playlistId);
+
     if (!playlist) {
         return res.status(HTTP_STATUS.NOT_FOUND).json({
             error: 'Playlist not found',
         });
     }
-    playlist.songIds = playlist.songIds
-        .map((songId) => {
-            const song = songs.find((s) => s.id === songId);
-            return song;
-        })
-    res.status(HTTP_STATUS.OK).json(playlist.songIds);
+
+    // Create a new array containing the full song objects
+    const songsInPlaylist = playlist.songIds
+        .map((songId) => songs.find((song) => song.id === songId))
+        .filter(Boolean);
+
+    // Return the playlist with the full song objects
+    return res.status(HTTP_STATUS.OK).json({
+        id: playlist.id,
+        name: playlist.name,
+        songIds: playlist.songIds,
+        songs: songsInPlaylist,
+    });
 });
 
 // MARK: Create a new playlists
