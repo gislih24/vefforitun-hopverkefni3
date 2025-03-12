@@ -140,20 +140,15 @@ app.patch(apiPath + version + '/songs/:songId', (req, res) => {
 
 /* 4. Delete a song */
 app.delete(apiPath + version + '/songs/:songId', (req, res) => {
-    const songId = parseInt(req.params.songId, 10);
-    const songIndex = songs.findIndex((song) => song.id === songId);
-    if (songIndex === -1) {
+    // TODO: Update songs inside of playlists as well
+    const index = songs.findIndex((song) => song.id == req.params.songId);
+    if (index === -1) {
         return res.status(HTTP_STATUS.NOT_FOUND).json({
-            message: `Song with id ${songId} does not exist.`,
+            message: 'Song with id ' + req.params.songId + ' does not exist.',
         });
     }
-    // Removes reference to the song id from all playlists
-    playlists.forEach((playlist) => {
-        playlist.songIds = playlist.songIds.filter((id) => id !== songId);
-    });
-    // Delete the song from the songs array
-    const deletedSongs = songs.splice(songIndex, 1);
-    return res.status(HTTP_STATUS.OK).json(deletedSongs[0]);
+    const deletedSong = songs.splice(index, 1);
+    return res.status(HTTP_STATUS.OK).json(deletedSong);
 });
 
 /* --------------------------
@@ -181,10 +176,11 @@ app.get(apiPath + version + '/playlists/:id', (req, res) => {
         });
     }
     playlist.songIds = playlist.songIds
-        .map(songId => songs.find(song => song.id === songId))
-        .filter(Boolean);
-    res.status(HTTP_STATUS.OK).json(playlist);
-    return playlist.songIds
+        .map((songId) => {
+            const song = songs.find((s) => s.id === songId);
+            return song;
+        })
+    res.status(HTTP_STATUS.OK).json(playlist.songIds);
 });
 
 // MARK: Create a new playlists
