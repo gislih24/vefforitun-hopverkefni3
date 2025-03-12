@@ -108,7 +108,7 @@ app.post(apiPath + version + '/songs', (req, res) => {
 });
 
 /* 3. Partially update a song */
-app.patch(apiPath + version + '/songs', (req, res) => {
+app.patch(apiPath + version + '/songs/:songId', (req, res) => {
     // Check that at least one field (title or artist) is provided
     if (
         req.body === undefined ||
@@ -139,6 +139,17 @@ app.patch(apiPath + version + '/songs', (req, res) => {
 });
 
 /* 4. Delete a song */
+app.delete(apiPath + version + '/songs/:songId', (req, res) => {
+    // TODO: Update songs inside of playlists as well
+    const index = songs.findIndex((song) => song.id == req.params.songId);
+    if (index === -1) {
+        return res.status(HTTP_STATUS.NOT_FOUND).json({
+            message: 'Song with id ' + req.params.songId + ' does not exist.',
+        });
+    }
+    const deletedSong = songs.splice(index, 1);
+    return res.status(HTTP_STATUS.OK).json(deletedSong);
+});
 
 /* --------------------------
 

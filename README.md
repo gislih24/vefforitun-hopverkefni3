@@ -6,9 +6,9 @@
 2. **Create** a new song
 	- [x] `POST /songs`
 3. **Partially update** a song
-	- [ ] `PATCH /songs`
+	- [?] `PATCH /songs`
 4. **Delete** a song
-	- [ ] `DELETE /songs/{id}`
+	- [?] `DELETE /songs/{id}`
 ### Playlists
 1. **Read** all playlists
 	- [ ] `GET /playlists`
