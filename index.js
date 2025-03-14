@@ -284,8 +284,18 @@ app.post(apiPath + version + '/playlists', (req, res) => {
 app.patch(
     apiPath + version + '/playlists/:playlistId/songs/:songId',
     (req, res) => {
-        const playlistIdNum = Number(req.params.playlistId);
-        const songIdNum = Number(req.params.songId);
+        const playlistIdNum = parseInt(req.params.playlistId, 10);
+        if (isNaN(playlistIdNum)) {
+            return res
+                .status(HTTP_STATUS.BAD_REQUEST)
+                .json({ message: 'Invalid playlist id format.' });
+        }
+        const songIdNum = parseInt(req.params.songId, 10);
+        if (isNaN(songIdNum)) {
+            return res
+                .status(HTTP_STATUS.BAD_REQUEST)
+                .json({ message: 'Invalid song id format.' });
+        }
         const playlist = playlists.find(
             (currentPlaylist) => currentPlaylist.id === playlistIdNum,
         );
@@ -307,7 +317,7 @@ app.patch(
 
         // Check if the song is already in the playlist
         if (playlist.songIds.includes(songIdNum)) {
-            return res.status(HTTP_STATUS.CONFLICT).json({
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({
                 message: 'Song already exists in the playlist',
             });
         }
