@@ -125,9 +125,15 @@ app.post(apiPath + version + '/songs', (req, res) => {
 
 /* 3. Partially update a song */
 app.patch(apiPath + version + '/songs/:songId', (req, res) => {
+    const songId = parseInt(req.params.songId, 10);
+    if (isNaN(songId)) {
+        return res
+            .status(HTTP_STATUS.BAD_REQUEST)
+            .json({ message: 'Invalid song id format.' });
+    }
     // Check that at least one field (title or artist) is provided
     if (
-        req.body === undefined ||
+        !req.body ||
         (req.body.title === undefined && req.body.artist === undefined)
     ) {
         return res.status(HTTP_STATUS.BAD_REQUEST).json({
