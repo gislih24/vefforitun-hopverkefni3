@@ -254,7 +254,7 @@ app.post(apiPath + version + '/playlists', (req, res) => {
 // MARK: Add song to an existing playlist
 /* 4. Add song to an existing playlist */
 
-app.patch(apiPath + version + '/playlists/:id', (req, res) => {
+app.patch(apiPath + version + '/playlists/:id/songs/:id', (req, res) => {
 
     const { playlistId, songId } = req.params;
 
