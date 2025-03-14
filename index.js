@@ -255,21 +255,22 @@ app.post(apiPath + version + '/playlists', (req, res) => {
 /* 4. Add song to an existing playlist */
 
 app.patch(apiPath + version + '/playlists/:id', (req, res) => {
-
     const { playlistId, songId } = req.params;
 
     const playlistIdNum = Number(playlistId);
-    const songIdNum = Number(songId); 
-    const playlist = playlists.find((pl) => pl.id === playlistId);
+    const songIdNum = Number(songId);
+    const playlist = playlists.find(
+        (currentPlaylist) => currentPlaylist.id === playlistIdNum,
+    );
 
     if (!playlist) {
-    // If the playlist is not found in the array, return an error.
+        // If the playlist is not found in the array, return an error.
         return res.status(HTTP_STATUS.NOT_FOUND).json({
             message: 'Playlist not found',
         });
     }
 
-    const song = songs.find((song) => song.id == req.params.songId);
+    const song = songs.find((song) => song.id === songIdNum);
     // If the song is not found in the array, return an error.
     if (!song) {
         return res.status(HTTP_STATUS.NOT_FOUND).json({
@@ -297,8 +298,7 @@ app.patch(apiPath + version + '/playlists/:id', (req, res) => {
         name: playlist.name,
         songIds: playlist.songIds,
         songs: songsInPlaylist,
-});
-
+    });
 });
 
 /* --------------------------
