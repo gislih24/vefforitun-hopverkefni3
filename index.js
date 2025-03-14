@@ -89,32 +89,33 @@ app.get(apiPath + version + '/songs', (req, res) => {
 app.post(apiPath + version + '/songs', (req, res) => {
     // Check if request body contains required fields
     if (
-        req.body === undefined ||
-        req.body.title !== 'string' ||
-        req.body.artist !== 'string'
-
+        !req.body ||
+        typeof req.body.title !== 'string' ||
+        typeof req.body.artist !== 'string'
     ) {
         return res.status(HTTP_STATUS.BAD_REQUEST).json({
             message:
                 'Title and artist fields are required in the request body.',
         });
     }
+    const title = req.body.title.trim();
+    const artist = req.body.artist.trim();
     // Check if song already exists in the songs list
     if (
         songs.some(
             (song) =>
-                song.title.toLowerCase() === req.body.title.toLowerCase() &&
-                song.artist.toLowerCase() === req.body.artist.toLowerCase(),
+                song.title.toLowerCase().trim() === title.toLowerCase() &&
+                song.artist.toLowerCase().trim() === artist.toLowerCase(),
         )
     ) {
-        return res.status(HTTP_STATUS.CONFLICT).json({
+        return res.status(HTTP_STATUS.BAD_REQUEST).json({
             message: 'Song already exists',
         });
     }
     // Create new song object and add it to the songs array
     const newSong = {
-        title: req.body.title,
-        artist: req.body.artist,
+        title,
+        artist,
         id: nextSongId,
     };
     songs.push(newSong);
