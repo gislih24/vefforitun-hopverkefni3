@@ -102,8 +102,8 @@ app.post(apiPath + version + '/songs', (req, res) => {
     if (
         songs.some(
             (song) =>
-                song.title === req.body.title &&
-                song.artist === req.body.artist,
+                song.title.toLowerCase() === req.body.title.toLowerCase() &&
+                song.artist.toLowerCase() === req.body.artist.toLowerCase(),
         )
     ) {
         return res.status(HTTP_STATUS.CONFLICT).json({
