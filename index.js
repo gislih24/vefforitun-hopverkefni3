@@ -164,10 +164,16 @@ app.patch(apiPath + version + '/songs/:songId', (req, res) => {
 app.delete(apiPath + version + '/songs/:songId', (req, res) => {
     // Converts songId from string → integer(base 10)
     const songId = parseInt(req.params.songId, 10);
+    // Validate songId format
+    if (isNaN(songId)) {
+        return res.status(HTTP_STATUS.BAD_REQUEST).json({
+            message: 'Invalid song id format.',
+        });
+    }
     // If the song is found in any playlist, block the request
     for (const playlist of playlists) {
         if (playlist.songIds.includes(songId)) {
-            return res.status(HTTP_STATUS.CONFLICT).json({
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({
                 message:
                     'Cannot delete song since it is part of an existing playlist.',
             });
@@ -185,6 +191,12 @@ app.delete(apiPath + version + '/songs/:songId', (req, res) => {
     const deletedSong = songs.splice(index, 1)[0];
     // Return the deleted song
     return res.status(HTTP_STATUS.OK).json(deletedSong);
+});
+// New DELETE route for requests without songId
+app.delete(apiPath + version + '/songs', (req, res) => {
+    return res
+        .status(HTTP_STATUS.METHOD_NOT_ALLOWED)
+        .json({ message: 'Method Not Allowed' });
 });
 
 /* --------------------------
