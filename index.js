@@ -225,9 +225,7 @@ app.post(apiPath + version + '/playlists', (req, res) => {
     // Check if request body contains required fields
     if (
         req.body === undefined ||
-        req.body.id === undefined ||
-        req.body.name === undefined ||
-        req.body.songIds === undefined
+        req.body.name === undefined
     ) {
         return res.status(HTTP_STATUS.BAD_REQUEST).json({
             message:
@@ -254,7 +252,7 @@ app.post(apiPath + version + '/playlists', (req, res) => {
 // MARK: Add song to an existing playlist
 /* 4. Add song to an existing playlist */
 
-app.patch(apiPath + version + '/playlists/:playlistId/songIds/:songId', (req, res) => {
+app.patch(apiPath + version + '/playlists/:playlistId/songs/:songId', (req, res) => {
     const playlistIdNum = Number(req.params.playlistId);
     const songIdNum = Number(req.params.songId);
     const playlist = playlists.find(
