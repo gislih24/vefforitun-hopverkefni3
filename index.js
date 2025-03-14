@@ -246,7 +246,7 @@ app.post(apiPath + version + '/playlists', (req, res) => {
         name: req.body.name,
         songIds: [],
     };
-    songs.push(newPlaylist);
+    playlists.push(newPlaylist);
     nextPlaylistId++;
     return res.status(HTTP_STATUS.CREATED).json(newPlaylist);
 });
