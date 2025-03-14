@@ -90,9 +90,8 @@ app.post(apiPath + version + '/songs', (req, res) => {
     // Check if request body contains required fields
     if (
         req.body === undefined ||
-        req.body.title !== 'string' ||
-        req.body.artist !== 'string'
-
+        typeof req.body.title !== 'string' ||
+        typeof req.body.artist !== 'string'
     ) {
         return res.status(HTTP_STATUS.BAD_REQUEST).json({
             message:
