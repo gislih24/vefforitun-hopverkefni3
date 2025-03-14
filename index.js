@@ -249,6 +249,7 @@ app.patch(apiPath + version + '/playlists/:id', (req, res) => {
     const playlist = playlists.find((pl) => pl.id === playlistId);
 
     if (!playlist) {
+    // If the playlist is not found in the array, return an error.
         return res.status(HTTP_STATUS.NOT_FOUND).json({
             message: 'Playlist not found',
         });
@@ -262,6 +263,15 @@ app.patch(apiPath + version + '/playlists/:id', (req, res) => {
         });
     }
 
+    // Check if the song is already in the playlist
+    if (playlist.songIds.includes(songIdNum)) {
+        return res.status(HTTP_STATUS.CONFLICT).json({
+            message: 'Song already exists in the playlist',
+        });
+    }
+
+    // Add the songId to the playlist's songIds array
+    playlist.songIds.push(songIdNum);
 
     // Create a new array containing the full song objects
     const songsInPlaylist = playlist.songIds
