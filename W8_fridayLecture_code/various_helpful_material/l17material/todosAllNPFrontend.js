@@ -1,55 +1,66 @@
+// Import Express for creating the web server and Path for handling file paths.
 const express = require('express');
-var path = require('path');
+const path = require('path');
 
+// Create an instance of an Express application.
 const app = express();
+// Define the port on which the server will listen.
 const port = 3000;
 
-//Import a body parser module to be able to access the request body as json
-const bodyParser = require('body-parser');
-//Tell express to use the body parser module
-app.use(bodyParser.json());
-
-var root = path.normalize(__dirname + '/..');
-app.use(express.static(path.join(root, 'client')));
-app.set('appPath', 'client');
-
+// Define an object with common HTTP status codes.
 const HTTP_STATUS = {
-    OK: 200,
-    CREATED: 201,
-    BAD_REQUEST: 400,
-    NOT_FOUND: 404,
-    METHOD_NOT_ALLOWED: 405,
+    OK: 200, // Standard response for successful HTTP requests.
+    CREATED: 201, // Indicates that a resource was successfully created.
+    BAD_REQUEST: 400, // The server could not understand the request.
+    NOT_FOUND: 404, // The requested resource was not found.
+    METHOD_NOT_ALLOWED: 405, // The request method is known by the server but is not supported.
 };
 
-let nextId = 11;
-let nextNoteId = 13;
+// Import the body-parser module to parse incoming JSON data.
+const bodyParser = require('body-parser');
+// Tell Express to use the body-parser middleware for JSON parsing.
+app.use(bodyParser.json());
+
+// Normalize the root directory and set up static file serving from the 'client' folder.
+const root = path.normalize(__dirname + '/..'); // Determine the parent directory.
+app.use(express.static(path.join(root, 'client'))); // Serve static files from 'client'.
+app.set('appPath', 'client'); // Set the application path for static files.
+
+// Define initial unique IDs and sample data for users.
+let nextId = 11; // Next available user id.
+let nextNoteId = 13; // Next available note id.
 let users = [
-    { id: 5, username: 'Alice', age: 25 },
-    { id: 10, username: 'Bob', age: 30 },
+    { id: 5, username: 'Alice', age: 25 }, // Sample user: Alice.
+    { id: 10, username: 'Bob', age: 30 }, // Sample user: Bob.
 ];
-let notes = [
+
+// Define sample notes for users.
+const notes = [
     {
-        userId: 5,
+        userId: 5, // Notes for user with id 5.
         userNotes: [
-            { id: 10, name: 'todos for today', content: 'Prepare Lab 6' },
+            { id: 10, name: 'todos for today', content: 'Prepare Lab 6' }, // Note for Alice.
             {
                 id: 12,
                 name: 'memo for l15',
                 content: 'Do not forget to mention Heroku',
-            },
+            }, // Additional note.
         ],
     },
     {
-        userId: 10,
-        userNotes: [{ id: 1, name: 'shopping list', content: 'Milk, Cheese' }],
+        userId: 10, // Notes for user with id 10.
+        userNotes: [{ id: 1, name: 'shopping list', content: 'Milk, Cheese' }], // Note for Bob.
     },
 ];
 
-//User endpoints
+// User endpoints
+
+// GET /users - Retrieve and return all users.
 app.get('/users', (req, res) => {
     res.status(HTTP_STATUS.OK).json(users);
 });
 
+// GET /users/:userId - Retrieve a specific user by id.
 app.get('/users/:userId', (req, res) => {
     for (let i = 0; i < users.length; i++) {
         if (users[i].id == req.params.userId) {
@@ -62,6 +73,7 @@ app.get('/users/:userId', (req, res) => {
     });
 });
 
+// POST /users - Create a new user using provided "username" and "age" fields.
 app.post('/users', (req, res) => {
     if (
         req.body === undefined ||
@@ -72,19 +84,20 @@ app.post('/users', (req, res) => {
             message: 'username and age fields are required in the request body',
         });
     } else {
-        let newUser = {
+        const newUser = {
             username: req.body.username,
             age: req.body.age,
             id: nextId,
         };
         users.push(newUser);
-        let newNotes = { userId: nextId, userNotes: [] };
+        const newNotes = { userId: nextId, userNotes: [] };
         notes.push(newNotes);
         nextId++;
         res.status(HTTP_STATUS.CREATED).json(newUser);
     }
 });
 
+// PUT /users/:userId - Replace an existing user entirely with new "username" and "age".
 app.put('/users/:userId', (req, res) => {
     if (
         req.body === undefined ||
@@ -109,40 +122,40 @@ app.put('/users/:userId', (req, res) => {
     }
 });
 
+// PATCH /users/:userId - Partially update the user (either "username" or "age" can be updated).
 app.patch('/users/:userId', (req, res) => {
     if (
-        req.body === undefined ||
+        !req.body ||
         (req.body.username === undefined && req.body.age === undefined)
     ) {
-        res.status(HTTP_STATUS.BAD_REQUEST).json({
+        return res.status(HTTP_STATUS.BAD_REQUEST).json({
             message:
                 'Either username or age field is required in the request body',
         });
-    } else {
-        for (let i = 0; i < users.length; i++) {
-            if (users[i].id == req.params.userId) {
-                if (req.body.username !== undefined) {
-                    users[i].username = req.body.username;
-                }
-                if (req.body.age !== undefined) {
-                    users[i].age = req.body.age;
-                }
-                res.status(HTTP_STATUS.OK).json(users[i]);
-                return;
-            }
-        }
-        res.status(HTTP_STATUS.NOT_FOUND).json({
-            message: 'User with id ' + req.params.userId + ' does not exist.',
-        });
     }
+    const user = users.find((u) => u.id == req.params.userId);
+    if (user) {
+        if (req.body.username !== undefined) {
+            user.username = req.body.username;
+        }
+        if (req.body.age !== undefined) {
+            user.age = req.body.age;
+        }
+        return res.status(HTTP_STATUS.OK).json(user);
+    }
+    return res.status(HTTP_STATUS.NOT_FOUND).json({
+        message: 'User with id ' + req.params.userId + ' does not exist.',
+    });
 });
 
+// DELETE /users - Delete all users and return the deleted list.
 app.delete('/users', (req, res) => {
-    var returnArray = users.slice();
+    const returnArray = users.slice();
     users = [];
     res.status(HTTP_STATUS.OK).json(returnArray);
 });
 
+// DELETE /users/:userId - Delete a specific user by id.
 app.delete('/users/:userId', (req, res) => {
     for (let i = 0; i < users.length; i++) {
         if (users[i].id == req.params.userId) {
@@ -155,7 +168,9 @@ app.delete('/users/:userId', (req, res) => {
     });
 });
 
-//Note endpoints
+// Note endpoints
+
+// GET /users/:userId/notes - Retrieve all notes for the specified user.
 app.get('/users/:userId/notes', (req, res) => {
     for (let i = 0; i < notes.length; i++) {
         if (notes[i].userId == req.params.userId) {
@@ -168,30 +183,28 @@ app.get('/users/:userId/notes', (req, res) => {
     });
 });
 
+// GET /users/:userId/notes/:noteId - Retrieve a specific note for a user.
 app.get('/users/:userId/notes/:noteId', (req, res) => {
-    for (let i = 0; i < notes.length; i++) {
-        if (notes[i].userId == req.params.userId) {
-            for (let j = 0; j < notes[i].userNotes.length; j++) {
-                if (notes[i].userNotes[j].id == req.params.noteId) {
-                    res.status(HTTP_STATUS.OK).json(notes[i].userNotes[j]);
-                    return;
-                }
-            }
-            res.status(HTTP_STATUS.NOT_FOUND).json({
-                message:
-                    'Note with id ' +
-                    req.params.noteId +
-                    ' does not exist for user ' +
-                    req.params.userId,
-            });
-            return;
-        }
+    const userNotesObj = notes.find((n) => n.userId == req.params.userId);
+    if (!userNotesObj) {
+        return res.status(HTTP_STATUS.NOT_FOUND).json({
+            message: 'User with id ' + req.params.userId + ' does not exist',
+        });
     }
-    res.status(HTTP_STATUS.NOT_FOUND).json({
-        message: 'User with id ' + req.params.userId + ' does not exist',
-    });
+    const note = userNotesObj.userNotes.find((n) => n.id == req.params.noteId);
+    if (!note) {
+        return res.status(HTTP_STATUS.NOT_FOUND).json({
+            message:
+                'Note with id ' +
+                req.params.noteId +
+                ' does not exist for user ' +
+                req.params.userId,
+        });
+    }
+    return res.status(HTTP_STATUS.OK).json(note);
 });
 
+// POST /users/:userId/notes - Create a new note for a specified user.
 app.post('/users/:userId/notes', (req, res) => {
     if (
         req.body === undefined ||
@@ -204,7 +217,7 @@ app.post('/users/:userId/notes', (req, res) => {
     } else {
         for (let i = 0; i < notes.length; i++) {
             if (notes[i].userId == req.params.userId) {
-                let newNote = {
+                const newNote = {
                     name: req.body.name,
                     content: req.body.content,
                     id: nextNoteId,
@@ -221,71 +234,63 @@ app.post('/users/:userId/notes', (req, res) => {
     }
 });
 
+// PUT /users/:userId/notes/:noteId - Replace an entire note with new data.
 app.put('/users/:userId/notes/:noteId', (req, res) => {
     if (
         req.body === undefined ||
         req.body.name === undefined ||
         req.body.content === undefined
     ) {
-        res.status(HTTP_STATUS.BAD_REQUEST).json({
+        return res.status(HTTP_STATUS.BAD_REQUEST).json({
             message: 'name and content fields are required in the request body',
         });
-    } else {
-        for (let i = 0; i < notes.length; i++) {
-            if (notes[i].userId == req.params.userId) {
-                for (let j = 0; j < notes[i].userNotes.length; j++) {
-                    if (notes[i].userNotes[j].id == req.params.noteId) {
-                        notes[i].userNotes[j].name = req.body.name;
-                        notes[i].userNotes[j].content = req.body.content;
-                        res.status(HTTP_STATUS.CREATED).json(
-                            notes[i].userNotes[j],
-                        );
-                        return;
-                    }
-                }
-                res.status(HTTP_STATUS.NOT_FOUND).json({
-                    message:
-                        'Note with id ' + req.params.noteId + ' does not exist',
-                });
-                return;
-            }
-        }
-        res.status(HTTP_STATUS.NOT_FOUND).json({
+    }
+    const userNotesObj = notes.find((n) => n.userId == req.params.userId);
+    if (!userNotesObj) {
+        return res.status(HTTP_STATUS.NOT_FOUND).json({
             message: 'User with id ' + req.params.userId + ' does not exist',
         });
     }
-});
-
-app.delete('/users/:userId/notes/:noteId', (req, res) => {
-    for (let i = 0; i < notes.length; i++) {
-        if (notes[i].userId == req.params.userId) {
-            for (let j = 0; j < notes[i].userNotes.length; j++) {
-                if (notes[i].userNotes[j].id == req.params.noteId) {
-                    res.status(HTTP_STATUS.OK).json(
-                        notes[i].userNotes.splice(j, 1),
-                    );
-                    return;
-                }
-            }
-            res.status(HTTP_STATUS.NOT_FOUND).json({
-                message:
-                    'Note with id ' +
-                    req.params.noteId +
-                    ' does not exist for user ' +
-                    req.params.userId,
-            });
-            return;
-        }
+    const note = userNotesObj.userNotes.find((n) => n.id == req.params.noteId);
+    if (!note) {
+        return res.status(HTTP_STATUS.NOT_FOUND).json({
+            message: 'Note with id ' + req.params.noteId + ' does not exist',
+        });
     }
-    res.status(HTTP_STATUS.NOT_FOUND).json({
-        message: 'User with id ' + req.params.userId + ' does not exist',
-    });
+    note.name = req.body.name;
+    note.content = req.body.content;
+    return res.status(HTTP_STATUS.CREATED).json(note);
 });
 
+// DELETE /users/:userId/notes/:noteId - Delete a specific note from a user's notes.
+app.delete('/users/:userId/notes/:noteId', (req, res) => {
+    const userNotesObj = notes.find((n) => n.userId == req.params.userId);
+    if (!userNotesObj) {
+        return res.status(HTTP_STATUS.NOT_FOUND).json({
+            message: 'User with id ' + req.params.userId + ' does not exist',
+        });
+    }
+    const noteIndex = userNotesObj.userNotes.findIndex(
+        (n) => n.id == req.params.noteId,
+    );
+    if (noteIndex === -1) {
+        return res.status(HTTP_STATUS.NOT_FOUND).json({
+            message:
+                'Note with id ' +
+                req.params.noteId +
+                ' does not exist for user ' +
+                req.params.userId,
+        });
+    }
+    const removedNote = userNotesObj.userNotes.splice(noteIndex, 1);
+    return res.status(HTTP_STATUS.OK).json(removedNote);
+});
+
+// DELETE /users/:userId/notes - Delete all notes for a specified user.
 app.delete('/users/:userId/notes', (req, res) => {
     for (let i = 0; i < notes.length; i++) {
         if (notes[i].userId == req.params.userId) {
-            var returnArray = notes[i].userNotes.slice();
+            const returnArray = notes[i].userNotes.slice();
             notes[i].userNotes = [];
             res.status(HTTP_STATUS.OK).json(returnArray);
             return;
@@ -296,6 +301,7 @@ app.delete('/users/:userId/notes', (req, res) => {
     });
 });
 
+// GET /notes - Retrieve and return all notes from all users.
 app.get('/notes', (req, res) => {
     let allNotes = [];
     for (let i = 0; i < notes.length; i++) {
@@ -304,17 +310,19 @@ app.get('/notes', (req, res) => {
     res.status(HTTP_STATUS.OK).json(allNotes);
 });
 
+// GET /frontend - Serve the frontend HTML file.
 app.get('/frontend', (req, res) => {
-    var relativeAppPath = req.app.get('appPath');
-    var absoluteAppPath = path.resolve(relativeAppPath);
+    const relativeAppPath = req.app.get('appPath');
+    const absoluteAppPath = path.resolve(relativeAppPath);
     res.sendFile(absoluteAppPath + '/frontend.html');
 });
 
-//Default: Not supported
+// Default route: any non-supported operation returns 405 METHOD NOT ALLOWED.
 app.use('*', (req, res) => {
     res.status(HTTP_STATUS.METHOD_NOT_ALLOWED).send('Operation not supported.');
 });
 
+// Start the Express server and listen on the designated port.
 app.listen(port, () => {
     console.log('Express app listening on port ' + port);
 });

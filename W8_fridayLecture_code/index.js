@@ -19,22 +19,23 @@ const HTTP_STATUS = {
     CREATED: 201,
 };
 
-// Tell express to use the body parser module
-app.use(bodyParser.json());
+// Apply middleware to parse JSON in incoming requests.
+app.use(bodyParser.json()); // Parses JSON-formatted request bodies
 
-// Tell express to use cors -- enables CORS for this backend
-app.use(cors());
+// Enable CORS to let the API respond to requests from different origins.
+app.use(cors()); // Activates Cross-Origin Resource Sharing
 
-// Set Cors-related headers to prevent blocking of local requests
+// Set custom HTTP headers (CORS headers) to further allow cross-origin requests.
 app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Origin', '*'); // Allow any domain to access this API
     res.header(
         'Access-Control-Allow-Headers',
         'Origin, X-Requested-With, Content-Type, Accept',
-    );
-    next();
+    ); // Specify permitted request headers
+    next(); // Proceed to the next middleware function in the stack
 });
 
+// Define an array of destination objects with details.
 const destinations = [
     {
         id: 1,
@@ -48,8 +49,9 @@ const destinations = [
         knownFor: 'Cherry blossoms, traditional and modern culture',
         bestTime: 'March to May, October to November',
     },
-];
+]; // List of destinations available in this API
 
+// Define an array of attraction objects with details.
 const attractions = [
     {
         id: 1,
@@ -83,15 +85,16 @@ const attractions = [
         description: 'Offers panoramic views of Tokyo.',
         visitDuration: '1-2 hours',
     },
-];
+]; // List of attractions associated with destinations
 
 /* YOUR CODE STARTS HERE */
-let nextAttractionId = 5;
-let nextDestinationId = 3;
+let nextAttractionId = 5; // Tracker for the next unique attraction ID
+let nextDestinationId = 3; // Tracker for the next unique destination ID
 
 /* Read all Destinations
 Requirement: Retrieves a list of all destinations, including 
               all details for each destination.
+Description: Sends back an array of all destination objects.
 URL: http://localhost:3000/api/v1/destinations
 Method: GET
 Input: None
@@ -119,6 +122,7 @@ app.get(apiPath + version + '/destinations', (req, res) => {
 /* Read all attractions 
 Requirement: Retrieves a list of all attractions, including 
              all details for each attraction. 
+Description: Sends back an array of all attraction objects.
 URL: http://localhost:3000/api/v1/attractions
 Method: GET
 Input: None
@@ -149,6 +153,7 @@ app.get(apiPath + version + '/attractions', (req, res) => {
 
 /* Create a new attraction 
 Requirement: Creation of a new attraction with all details. 
+Description: Creates and adds a new attraction linked to a given destination.
 URL: http://localhost:3000/api/v1/destinations/:destinationId/attractions
 Method: POST
 Input: 
@@ -176,17 +181,18 @@ Output:
 app.post(
     apiPath + version + '/destinations/:destinationId/attractions',
     (req, res) => {
+        // Destructure required properties from the request body.
         const { name, type, description, visitDuration } = req.body;
+        // Convert the destinationId from URL parameter to a number.
         const destinationId = Number(req.params.destinationId);
-        /*  Check that destinationId is a number */
+        // Validate that the destinationId is a valid number.
         if (isNaN(destinationId)) {
             return res.status(HTTP_STATUS.BAD_REQUEST).json({
                 message: 'Invalid destinationId, it must be a number.',
             });
         }
 
-        /*  Check if a destination with destinationId
-        is a valid destination */
+        // Check to ensure the specified destination exists.
         const destinationIndex = destinations.findIndex(
             (destination) => destination.id === destinationId,
         );
@@ -196,9 +202,7 @@ app.post(
             });
         }
 
-        /*  Validation that name,type,description and visitDuration
-        are all in the body and are all strings */
-
+        // Validate that all required fields in the request body exist and are strings.
         if (
             !name ||
             typeof name !== 'string' ||
@@ -215,8 +219,7 @@ app.post(
             });
         }
 
-        /*  Add the new attraction to the already defined
-        attractions with an incremented id  */
+        // Create a new attraction object using the provided and validated data.
         const newAttraction = {
             id: nextAttractionId,
             destinationId,
@@ -225,11 +228,10 @@ app.post(
             description,
             visitDuration,
         };
-        attractions.push(newAttraction);
-        nextAttractionId++;
+        attractions.push(newAttraction); // Add the new attraction into the attractions array.
+        nextAttractionId++; // Increment to maintain unique IDs.
 
-        /*  Return with 201 Created with the newly created
-        attraction in the response */
+        // Respond with the newly created attraction and HTTP status 201 (Created).
         res.status(HTTP_STATUS.CREATED).json(newAttraction);
     },
 );
@@ -257,9 +259,10 @@ console.log('----------------------------');
 
 /* DO NOT REMOVE OR CHANGE THE FOLLOWING (IT HAS TO BE AT THE END OF THE FILE) */
 if (process.env.NODE_ENV !== 'test') {
+    // Begin listening on the specified port.
     app.listen(port, () => {
         console.log(`Server listening on port ${port}`);
     });
 }
 
-module.exports = app; // Export the app
+module.exports = app; // Export the Express app for testing or other external uses.
