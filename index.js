@@ -154,14 +154,28 @@ app.patch(apiPath + version + '/songs/:songId', (req, res) => {
 
 /* 4. Delete a song */
 app.delete(apiPath + version + '/songs/:songId', (req, res) => {
-    // TODO: Update songs inside of playlists as well
-    const index = songs.findIndex((song) => song.id == req.params.songId);
+    // Converts songId from string → integer(base 10)
+    const songId = parseInt(req.params.songId, 10);
+    // If the song is found in any playlist, block the request
+    for (const playlist of playlists) {
+        if (playlist.songIds.includes(songId)) {
+            return res.status(HTTP_STATUS.CONFLICT).json({
+                message:
+                    'Cannot delete song since it is part of an existing playlist.',
+            });
+        }
+    }
+
+    const index = songs.findIndex((song) => song.id === songId);
+    // If the song is not found in the array, return an error
     if (index === -1) {
         return res.status(HTTP_STATUS.NOT_FOUND).json({
-            message: 'Song with id ' + req.params.songId + ' does not exist.',
+            message: 'Song with id ' + songId + ' does not exist.',
         });
     }
-    const deletedSong = songs.splice(index, 1);
+    // Remove the song from the array
+    const deletedSong = songs.splice(index, 1)[0];
+    // Return the deleted song
     return res.status(HTTP_STATUS.OK).json(deletedSong);
 });
 
