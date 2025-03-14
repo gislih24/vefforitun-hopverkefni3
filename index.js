@@ -262,7 +262,7 @@ app.patch(apiPath + version + '/playlists/:id', (req, res) => {
     const playlist = playlists.find(
         (currentPlaylist) => currentPlaylist.id === playlistIdNum,
     );
-
+    
     if (!playlist) {
         // If the playlist is not found in the array, return an error.
         return res.status(HTTP_STATUS.NOT_FOUND).json({
