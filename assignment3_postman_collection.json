@@ -1,35 +1,41 @@
 {
-	"info": {
-		"_postman_id": "6449310e-018f-4aea-9aa7-1992f502c96a",
-		"name": "Song API",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "42333608"
-	},
-	"item": [
-		{
-			"name": "Get all songs",
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:3000/api/v1/songs",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"api",
-						"v1",
-						"songs"
-					]
-				}
-			},
-			"response": []
-		},
+    "info": {
+        "_postman_id": "6449310e-018f-4aea-9aa7-1992f502c96a",
+        "name": "Song API",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Get all songs",
+            "request": {
+                "auth": {
+                    "type": "noauth"
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "http://localhost:3000/api/v1/songs?filter=",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000",
+                    "path": [
+                        "api",
+                        "v1",
+                        "songs"
+                    ],
+                    "query": [
+                        {
+                            "key": "filter",
+                            "value": "",
+                            "description": "Optional filter to search in title or artist"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
         {
             "name": "Create new song",
             "request": {
@@ -40,7 +46,8 @@
                 "header": [
                     {
                         "key": "Content-Type",
-                        "value": "application/json"
+                        "value": "application/json",
+                        "type": "text"
                     }
                 ],
                 "body": {
@@ -63,171 +70,203 @@
             },
             "response": []
         },
-		{
-			"name": "Partially update a song",
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "PATCH",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:3000/api/v1/songs",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"api",
-						"v1",
-						"songs"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Delete a song",
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "DELETE",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:3000/api/v1/songs/:id",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"api",
-						"v1",
-						"songs",
-						":id"
-					],
-					"variable": [
-						{
-							"key": "id",
-							"value": ""
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Get all playlists",
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:3000/api/v1/playlists",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"api",
-						"v1",
-						"playlists"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Read a specific playlist",
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:3000/api/v1/playlists/:id",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"api",
-						"v1",
-						"playlists",
-						":id"
-					],
-					"variable": [
-						{
-							"key": "id",
-							"value": ""
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Create a new playlist",
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "POST",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:3000/api/v1/playlists",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"api",
-						"v1",
-						"playlists"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Add songs to existing playlist",
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "POST",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:3000/api/v1/playlists/:id/songIds",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"api",
-						"v1",
-						"playlists",
-						":id",
-						"songIds"
-					],
-					"variable": [
-						{
-							"key": "id",
-							"value": ""
-						}
-					]
-				}
-			},
-			"response": []
-		}
-	]
+        {
+            "name": "Partially update a song",
+            "request": {
+                "auth": {
+                    "type": "noauth"
+                },
+                "method": "PATCH",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\"title\": \"New Title\"}"
+                },
+                "url": {
+                    "raw": "http://localhost:3000/api/v1/songs/:songId",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000",
+                    "path": [
+                        "api",
+                        "v1",
+                        "songs",
+                        ":songId"
+                    ],
+                    "variable": [
+                        {
+                            "key": "songId",
+                            "value": ""
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Delete a song",
+            "request": {
+                "auth": {
+                    "type": "noauth"
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                    "raw": "http://localhost:3000/api/v1/songs/:songId",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000",
+                    "path": [
+                        "api",
+                        "v1",
+                        "songs",
+                        ":songId"
+                    ],
+                    "variable": [
+                        {
+                            "key": "songId",
+                            "value": ""
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Get all playlists",
+            "request": {
+                "auth": {
+                    "type": "noauth"
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "http://localhost:3000/api/v1/playlists",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000",
+                    "path": [
+                        "api",
+                        "v1",
+                        "playlists"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Read a specific playlist",
+            "request": {
+                "auth": {
+                    "type": "noauth"
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "http://localhost:3000/api/v1/playlists/:id",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000",
+                    "path": [
+                        "api",
+                        "v1",
+                        "playlists",
+                        ":id"
+                    ],
+                    "variable": [
+                        {
+                            "key": "id",
+                            "value": ""
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Create a new playlist",
+            "request": {
+                "auth": {
+                    "type": "noauth"
+                },
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\"name\": \"New Playlist Name\"}"
+                },
+                "url": {
+                    "raw": "http://localhost:3000/api/v1/playlists",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000",
+                    "path": [
+                        "api",
+                        "v1",
+                        "playlists"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Add song to an existing playlist",
+            "request": {
+                "auth": {
+                    "type": "noauth"
+                },
+                "method": "PATCH",
+                "header": [],
+                "url": {
+                    "raw": "http://localhost:3000/api/v1/playlists/:playlistId/songs/:songId",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000",
+                    "path": [
+                        "api",
+                        "v1",
+                        "playlists",
+                        ":playlistId",
+                        "songs",
+                        ":songId"
+                    ],
+                    "variable": [
+                        {
+                            "key": "playlistId",
+                            "value": ""
+                        },
+                        {
+                            "key": "songId",
+                            "value": ""
+                        }
+                    ]
+                }
+            },
+            "response": []
+        }
+    ]
 }
