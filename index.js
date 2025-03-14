@@ -216,6 +216,11 @@ app.get(apiPath + version + '/playlists', (req, res) => {
 
 app.get(apiPath + version + '/playlists/:id', (req, res) => {
     const playlistId = parseInt(req.params.id, 10);
+    if (isNaN(playlistId)) {
+        return res.status(HTTP_STATUS.BAD_REQUEST).json({
+            message: 'Invalid playlist id format.',
+        });
+    }
     const playlist = playlists.find((pl) => pl.id === playlistId);
 
     if (!playlist) {
