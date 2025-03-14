@@ -62,7 +62,7 @@ let nextPlaylistId = 4;
 /* --------------------------------ENDPOINTS-------------------------------- */
 /* --------------------------
 
-        SONGS ENDPOINTS
+        SONGS ENDPOINTS     
 
 -------------------------- */
 // MARK: Songs
@@ -167,7 +167,7 @@ app.delete(apiPath + version + '/songs/:songId', (req, res) => {
 
 /* --------------------------
 
-      PLAYLISTS ENDPOINTS
+      PLAYLISTS ENDPOINTS    
 
 -------------------------- */
 // MARK: Read all playlists
@@ -240,12 +240,49 @@ app.post(apiPath + version + '/playlists', (req, res) => {
 // MARK: Add song to an existing playlist
 /* 4. Add song to an existing playlist */
 
+app.patch(apiPath + version + '/playlists/:id', (req, res) => {
+
+    const { playlistId, songId } = req.params;
+
+    const playlistIdNum = Number(playlistId);
+    const songIdNum = Number(songId); 
+    const playlist = playlists.find((pl) => pl.id === playlistId);
+
+    if (!playlist) {
+        return res.status(HTTP_STATUS.NOT_FOUND).json({
+            message: 'Playlist not found',
+        });
+    }
+
+    const song = songs.find((song) => song.id == req.params.songId);
+    // If the song is not found in the array, return an error.
+    if (!song) {
+        return res.status(HTTP_STATUS.NOT_FOUND).json({
+            message: 'Song not found',
+        });
+    }
+
+
+    // Create a new array containing the full song objects
+    const songsInPlaylist = playlist.songIds
+        .map((songId) => songs.find((song) => song.id === songId))
+        .filter(Boolean);
+
+    return res.status(HTTP_STATUS.OK).json({
+        id: playlist.id,
+        name: playlist.name,
+        songIds: playlist.songIds,
+        songs: songsInPlaylist,
+});
+
+});
+
 /* --------------------------
 
-      SERVER INITIALIZATION
-
+      SERVER INITIALIZATION  
+      
 !! DO NOT REMOVE OR CHANGE THE FOLLOWING (IT HAS TO BE AT THE END OF THE FILE) !!
-
+      
 -------------------------- */
 if (process.env.NODE_ENV !== 'test') {
     app.listen(port, () => {
