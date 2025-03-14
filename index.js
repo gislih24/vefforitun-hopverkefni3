@@ -92,7 +92,6 @@ app.post(apiPath + version + '/songs', (req, res) => {
         req.body === undefined ||
         req.body.title !== 'string' ||
         req.body.artist !== 'string'
-
     ) {
         return res.status(HTTP_STATUS.BAD_REQUEST).json({
             message:
@@ -195,9 +194,11 @@ app.get(apiPath + version + '/playlists', (req, res) => {
 // MARK: Read a specific playlists
 /* 2. Read a specific playlist */
 
-app.get(apiPath + version + '/playlists/:id', (req, res) => {
-    const playlistId = parseInt(req.params.id, 10);
-    const playlist = playlists.find((pl) => pl.id === playlistId);
+app.get(apiPath + version + '/playlists/:playlistId', (req, res) => {
+    const playlistId = parseInt(req.params.playlistId, 10);
+    const playlist = playlists.find(
+        (currentPlaylist) => currentPlaylist.id === playlistId,
+    );
 
     if (!playlist) {
         return res.status(HTTP_STATUS.NOT_FOUND).json({
@@ -250,7 +251,7 @@ app.post(apiPath + version + '/playlists', (req, res) => {
 /* 4. Add song to an existing playlist */
 
 app.patch(
-    apiPath + version + '/playlists/:playlistId/songs/:songId',
+    apiPath + version + '/playlists/:playlistId/songIds/:songId',
     (req, res) => {
         const playlistIdNum = Number(req.params.playlistId);
         const songIdNum = Number(req.params.songId);
