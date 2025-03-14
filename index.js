@@ -62,13 +62,27 @@ let nextPlaylistId = 4;
 /* --------------------------------ENDPOINTS-------------------------------- */
 /* --------------------------
 
-        SONGS ENDPOINTS     
+        SONGS ENDPOINTS
 
 -------------------------- */
 // MARK: Songs
 /* 1. Read all songs */
 app.get(apiPath + version + '/songs', (req, res) => {
-    res.status(HTTP_STATUS.OK).json(songs);
+    // If filter is empty
+    if (!req.query.filter) {
+        // then just return all the songs.
+        return res.status(HTTP_STATUS.OK).json(songs);
+    }
+
+    // Filter songs where title or artist includes the filter (case-insensitive)
+    const filteredSongs = songs.filter((song) => {
+        return (
+            song.title.toLowerCase().includes(req.query.filter.toLowerCase()) ||
+            song.artist.toLowerCase().includes(req.query.filter.toLowerCase())
+        );
+    });
+
+    return res.status(HTTP_STATUS.OK).json(filteredSongs);
 });
 
 /* 2. Create a new song */
@@ -153,7 +167,7 @@ app.delete(apiPath + version + '/songs/:songId', (req, res) => {
 
 /* --------------------------
 
-      PLAYLISTS ENDPOINTS    
+      PLAYLISTS ENDPOINTS
 
 -------------------------- */
 // MARK: Read all playlists
@@ -207,12 +221,7 @@ app.post(apiPath + version + '/playlists', (req, res) => {
         });
     }
     // Check if playlist already exists in the playlist list
-    if (
-        playlists.some(
-            (playlist) =>
-                playlist.name === req.body.name
-        )
-    ) {
+    if (playlists.some((playlist) => playlist.name === req.body.name)) {
         return res.status(HTTP_STATUS.CONFLICT).json({
             message: 'Playlist already exists',
         });
@@ -233,10 +242,10 @@ app.post(apiPath + version + '/playlists', (req, res) => {
 
 /* --------------------------
 
-      SERVER INITIALIZATION  
-      
+      SERVER INITIALIZATION
+
 !! DO NOT REMOVE OR CHANGE THE FOLLOWING (IT HAS TO BE AT THE END OF THE FILE) !!
-      
+
 -------------------------- */
 if (process.env.NODE_ENV !== 'test') {
     app.listen(port, () => {
