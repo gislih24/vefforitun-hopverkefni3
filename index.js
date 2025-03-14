@@ -18,6 +18,7 @@ const HTTP_STATUS = {
     OK: 200,
     CREATED: 201,
     BAD_REQUEST: 400,
+    METHOD_NOT_ALLOWED: 405,
     NOT_FOUND: 404,
     CONFLICT: 409,
 };
@@ -68,21 +69,26 @@ let nextPlaylistId = 4;
 // MARK: Songs
 /* 1. Read all songs */
 app.get(apiPath + version + '/songs', (req, res) => {
-    // If filter is empty
-    if (!req.query.filter) {
-        // then just return all the songs.
-        return res.status(HTTP_STATUS.OK).json(songs);
+    if ('filter' in req.query) {
+        const filterVal = req.query.filter;
+        if (
+            typeof filterVal !== 'string' ||
+            filterVal.trim() === '' ||
+            ['null', 'undefined'].includes(filterVal.trim().toLowerCase())
+        ) {
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({
+                message: 'Invalid filter parameter.',
+            });
+        }
+        const filteredSongs = songs.filter((song) => {
+            return (
+                song.title.toLowerCase().includes(filterVal.toLowerCase()) ||
+                song.artist.toLowerCase().includes(filterVal.toLowerCase())
+            );
+        });
+        return res.status(HTTP_STATUS.OK).json(filteredSongs);
     }
-
-    // Filter songs where title or artist includes the filter (case-insensitive)
-    const filteredSongs = songs.filter((song) => {
-        return (
-            song.title.toLowerCase().includes(req.query.filter.toLowerCase()) ||
-            song.artist.toLowerCase().includes(req.query.filter.toLowerCase())
-        );
-    });
-
-    return res.status(HTTP_STATUS.OK).json(filteredSongs);
+    return res.status(HTTP_STATUS.OK).json(songs);
 });
 
 /* 2. Create a new song */

@@ -52,7 +52,7 @@
                 ],
                 "body": {
                     "mode": "raw",
-                    "raw": "{\"title\": \"Your Song Title\", \"artist\": \"Artist Name\"}"
+                    "raw": "{\"title\": \"string\", \"artist\": \"string\"}"
                 },
                 "url": {
                     "raw": "http://localhost:3000/api/v1/songs",
