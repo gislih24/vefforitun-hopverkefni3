@@ -223,13 +223,9 @@ app.get(apiPath + version + '/playlists/:id', (req, res) => {
 
 app.post(apiPath + version + '/playlists', (req, res) => {
     // Check if request body contains required fields
-    if (
-        req.body === undefined ||
-        req.body.name === undefined
-    ) {
+    if (req.body === undefined || req.body.name === undefined) {
         return res.status(HTTP_STATUS.BAD_REQUEST).json({
-            message:
-                'Id, name and songsId fields are required in the request body.',
+            message: 'Name field is required in the request body.',
         });
     }
     // Check if playlist already exists in the playlist list
@@ -238,7 +234,7 @@ app.post(apiPath + version + '/playlists', (req, res) => {
             message: 'Playlist already exists',
         });
     }
-    // Create new song object and add it to the songs array
+    // Create new playlist object and add it to the playlists array
     const newPlaylist = {
         id: nextPlaylistId,
         name: req.body.name,
@@ -252,50 +248,53 @@ app.post(apiPath + version + '/playlists', (req, res) => {
 // MARK: Add song to an existing playlist
 /* 4. Add song to an existing playlist */
 
-app.patch(apiPath + version + '/playlists/:playlistId/songs/:songId', (req, res) => {
-    const playlistIdNum = Number(req.params.playlistId);
-    const songIdNum = Number(req.params.songId);
-    const playlist = playlists.find(
-        (currentPlaylist) => currentPlaylist.id === playlistIdNum,
-    );
+app.patch(
+    apiPath + version + '/playlists/:playlistId/songs/:songId',
+    (req, res) => {
+        const playlistIdNum = Number(req.params.playlistId);
+        const songIdNum = Number(req.params.songId);
+        const playlist = playlists.find(
+            (currentPlaylist) => currentPlaylist.id === playlistIdNum,
+        );
 
-    if (!playlist) {
-        // If the playlist is not found in the array, return an error.
-        return res.status(HTTP_STATUS.NOT_FOUND).json({
-            message: 'Playlist not found',
+        if (!playlist) {
+            // If the playlist is not found in the array, return an error.
+            return res.status(HTTP_STATUS.NOT_FOUND).json({
+                message: 'Playlist not found',
+            });
+        }
+
+        const song = songs.find((song) => song.id === songIdNum);
+        // If the song is not found in the array, return an error.
+        if (!song) {
+            return res.status(HTTP_STATUS.NOT_FOUND).json({
+                message: 'Song not found',
+            });
+        }
+
+        // Check if the song is already in the playlist
+        if (playlist.songIds.includes(songIdNum)) {
+            return res.status(HTTP_STATUS.CONFLICT).json({
+                message: 'Song already exists in the playlist',
+            });
+        }
+
+        // Add the songId to the playlist's songIds array
+        playlist.songIds.push(songIdNum);
+
+        // Create a new array containing the full song objects
+        const songsInPlaylist = playlist.songIds
+            .map((songId) => songs.find((song) => song.id === songId))
+            .filter(Boolean);
+
+        return res.status(HTTP_STATUS.OK).json({
+            id: playlist.id,
+            name: playlist.name,
+            songIds: playlist.songIds,
+            songs: songsInPlaylist,
         });
-    }
-
-    const song = songs.find((song) => song.id === songIdNum);
-    // If the song is not found in the array, return an error.
-    if (!song) {
-        return res.status(HTTP_STATUS.NOT_FOUND).json({
-            message: 'Song not found',
-        });
-    }
-
-    // Check if the song is already in the playlist
-    if (playlist.songIds.includes(songIdNum)) {
-        return res.status(HTTP_STATUS.CONFLICT).json({
-            message: 'Song already exists in the playlist',
-        });
-    }
-
-    // Add the songId to the playlist's songIds array
-    playlist.songIds.push(songIdNum);
-
-    // Create a new array containing the full song objects
-    const songsInPlaylist = playlist.songIds
-        .map((songId) => songs.find((song) => song.id === songId))
-        .filter(Boolean);
-
-    return res.status(HTTP_STATUS.OK).json({
-        id: playlist.id,
-        name: playlist.name,
-        songIds: playlist.songIds,
-        songs: songsInPlaylist,
-    });
-});
+    },
+);
 
 /* --------------------------
 
