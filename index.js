@@ -71,29 +71,38 @@ let nextPlaylistId = 4;
 app.get(apiPath + version + '/songs', (req, res) => {
     if ('filter' in req.query) {
         const filterVal = req.query.filter;
+        /* Normalize the filter value by trimming it and converting it 
+        to lowercase. */
+        const normalizedFilterValue = filterVal.trim().toLowerCase();
+        /* Check if the filter value is a valid string. If it's not a string, 
+        if it's an empty string, or if it's 'null' or 'undefined', we will 
+        respond with BAD_REQUEST. */
         if (
-            typeof filterVal !== 'string' ||
-            filterVal.trim() === '' ||
-            ['null', 'undefined'].includes(filterVal.trim().toLowerCase())
+            typeof normalizedFilterValue !== 'string' ||
+            normalizedFilterValue === '' ||
+            ['null', 'undefined'].includes(normalizedFilterValue)
         ) {
             return res.status(HTTP_STATUS.BAD_REQUEST).json({
                 message: 'Invalid filter parameter.',
             });
         }
+        /* Creates a new array `filteredSongs` that contains only the songs that 
+        match the (normalized) filter criteria. */
         const filteredSongs = songs.filter((song) => {
             return (
-                song.title.toLowerCase().includes(filterVal.toLowerCase()) ||
-                song.artist.toLowerCase().includes(filterVal.toLowerCase())
+                song.title.toLowerCase().includes(normalizedFilterValue) ||
+                song.artist.toLowerCase().includes(normalizedFilterValue)
             );
         });
         return res.status(HTTP_STATUS.OK).json(filteredSongs);
     }
+    // If no filter is provided, simply return all of the songs.
     return res.status(HTTP_STATUS.OK).json(songs);
 });
 
 /* 2. Create a new song */
 app.post(apiPath + version + '/songs', (req, res) => {
-    // Check if request body contains required fields
+    // Check if request body contains the required fields
     if (
         !req.body ||
         typeof req.body.title !== 'string' ||
@@ -104,34 +113,42 @@ app.post(apiPath + version + '/songs', (req, res) => {
                 'Title and artist fields are required in the request body.',
         });
     }
-    const title = req.body.title.trim();
-    const artist = req.body.artist.trim();
-    // Check if song already exists in the songs list
+    /* Normalize the title and artist values by trimming them and converting
+    them to lowercase. */
+    const normalizedTitle = req.body.title.trim().toLowerCase();
+    const normalizedArtist = req.body.artist.trim().toLowerCase();
+    /* Check if the song already exists in the songs list. 
+    If so, return `BAD_REQUEST`. */
     if (
         songs.some(
             (song) =>
-                song.title.toLowerCase().trim() === title.toLowerCase() &&
-                song.artist.toLowerCase().trim() === artist.toLowerCase(),
+                song.title.toLowerCase().trim() === normalizedTitle &&
+                song.artist.toLowerCase().trim() === normalizedArtist,
         )
     ) {
         return res.status(HTTP_STATUS.BAD_REQUEST).json({
             message: 'Song already exists',
         });
     }
-    // Create new song object and add it to the songs array
+    // Create new song object,
     const newSong = {
-        title,
-        artist,
+        title: normalizedTitle,
+        artist: normalizedArtist,
         id: nextSongId,
     };
+    // and add it to the songs array.
     songs.push(newSong);
+    // Increment the ID counter.
     nextSongId++;
+    // Return the newly created song object with the appropriate status code.
     return res.status(HTTP_STATUS.CREATED).json(newSong);
 });
 
 /* 3. Partially update a song */
 app.patch(apiPath + version + '/songs/:songId', (req, res) => {
+    // Converts songId from string to an integer(base 10)
     const songId = parseInt(req.params.songId, 10);
+    // If the result is Not a Number(NaN), return an error.
     if (isNaN(songId)) {
         return res
             .status(HTTP_STATUS.BAD_REQUEST)
@@ -148,29 +165,29 @@ app.patch(apiPath + version + '/songs/:songId', (req, res) => {
         });
     }
 
-    const song = songs.find((song) => song.id == req.params.songId);
-    // If the song is not found in the array, return an error.
+    // Find the song in the array
+    const song = songs.find((song) => song.id == songId);
     if (!song) {
         return res.status(HTTP_STATUS.NOT_FOUND).json({
-            message: 'Song with id ' + req.params.songId + ' does not exist.',
+            message: 'Song with id ' + songId + ' does not exist.',
         });
     }
 
     // Update the fields that were provided
     if (req.body.title !== undefined) {
-        song.title = req.body.title;
+        song.title = req.body.title.trim();
     }
     if (req.body.artist !== undefined) {
-        song.artist = req.body.artist;
+        song.artist = req.body.artist.trim();
     }
     return res.status(HTTP_STATUS.OK).json(song);
 });
 
 /* 4. Delete a song */
 app.delete(apiPath + version + '/songs/:songId', (req, res) => {
-    // Converts songId from string → integer(base 10)
+    // Converts songId from string to an integer(base 10)
     const songId = parseInt(req.params.songId, 10);
-    // Validate songId format
+    // If the result is Not a Number(NaN), return an error.
     if (isNaN(songId)) {
         return res.status(HTTP_STATUS.BAD_REQUEST).json({
             message: 'Invalid song id format.',
@@ -185,24 +202,18 @@ app.delete(apiPath + version + '/songs/:songId', (req, res) => {
             });
         }
     }
-
+    // Find the index of the song in the array
     const index = songs.findIndex((song) => song.id === songId);
-    // If the song is not found in the array, return an error
+    // If the song is not found in the array, return an error.
     if (index === -1) {
         return res.status(HTTP_STATUS.NOT_FOUND).json({
             message: 'Song with id ' + songId + ' does not exist.',
         });
     }
-    // Remove the song from the array
+    // Remove the song from the array by its index
     const deletedSong = songs.splice(index, 1)[0];
-    // Return the deleted song
+    // Return the array without the song
     return res.status(HTTP_STATUS.OK).json(deletedSong);
-});
-// New DELETE route for requests without songId
-app.delete(apiPath + version + '/songs', (req, res) => {
-    return res
-        .status(HTTP_STATUS.METHOD_NOT_ALLOWED)
-        .json({ message: 'Method Not Allowed' });
 });
 
 /* --------------------------
@@ -214,29 +225,38 @@ app.delete(apiPath + version + '/songs', (req, res) => {
 /* 1. Read all playlists */
 
 app.get(apiPath + version + '/playlists', (req, res) => {
+    // Simply returns all playlists with http status 200.
     res.status(HTTP_STATUS.OK).json(playlists);
 });
 
-// MARK: Read a specific playlists
+// MARK: Read a specific playlist
 /* 2. Read a specific playlist */
 
 app.get(apiPath + version + '/playlists/:id', (req, res) => {
+    // Converts playlistId from string to an integer(base 10)
     const playlistId = parseInt(req.params.id, 10);
+    // If the result is Not a Number(NaN), return an error.
     if (isNaN(playlistId)) {
         return res.status(HTTP_STATUS.BAD_REQUEST).json({
             message: 'Invalid playlist id format.',
         });
     }
-    const playlist = playlists.find((pl) => pl.id === playlistId);
 
+    // Find the playlist with the appropriate ID in the array.
+    const playlist = playlists.find(
+        (currentPlaylist) => currentPlaylist.id === playlistId,
+    );
+    // Return an error if it is not found.
     if (!playlist) {
         return res.status(HTTP_STATUS.NOT_FOUND).json({
             error: 'Playlist not found',
         });
     }
 
-    // Create a new array containing the full song objects
+    // Create a new array containing the full song objects based on their ID's.
     const songsInPlaylist = playlist.songIds
+        /* Maps each songId to its full song object from the songs array and 
+        filters out any undefined values. */
         .map((songId) => songs.find((song) => song.id === songId))
         .filter(Boolean);
 
@@ -253,6 +273,7 @@ app.get(apiPath + version + '/playlists/:id', (req, res) => {
 /* 3. Create a new playlist */
 
 app.post(apiPath + version + '/playlists', (req, res) => {
+    // Check if request body contains the required fields
     if (
         !req.body ||
         typeof req.body.name !== 'string' ||
@@ -262,24 +283,27 @@ app.post(apiPath + version + '/playlists', (req, res) => {
             message: 'Name field must be a non-empty string.',
         });
     }
-    const name = req.body.name.trim();
+
+    // Check if the playlist name already exists
+    const normalizedName = req.body.name.toLowerCase().trim();
     if (
         playlists.some(
-            (playlist) =>
-                playlist.name.toLowerCase().trim() === name.toLowerCase(),
+            (playlist) => playlist.name.toLowerCase().trim() === normalizedName,
         )
     ) {
         return res.status(HTTP_STATUS.BAD_REQUEST).json({
             message: 'Playlist already exists',
         });
     }
+
     // Create new playlist object and add it to the playlists array
     const newPlaylist = {
         id: nextPlaylistId,
-        name,
+        name: normalizedName,
         songIds: [],
     };
     playlists.push(newPlaylist);
+    // Increment the ID counter.
     nextPlaylistId++;
     return res.status(HTTP_STATUS.CREATED).json(newPlaylist);
 });
@@ -290,6 +314,8 @@ app.post(apiPath + version + '/playlists', (req, res) => {
 app.patch(
     apiPath + version + '/playlists/:playlistId/songs/:songId',
     (req, res) => {
+        // Converts both playlistId and songId from string to an integer(base 10)
+        // If either result is Not a Number(NaN), return an error.
         const playlistIdNum = parseInt(req.params.playlistId, 10);
         if (isNaN(playlistIdNum)) {
             return res
@@ -302,36 +328,36 @@ app.patch(
                 .status(HTTP_STATUS.BAD_REQUEST)
                 .json({ message: 'Invalid song id format.' });
         }
+
+        /* Find both the song and the playlist based on their respective ID's,
+        and if either of them does not exist, return an error. */
         const playlist = playlists.find(
             (currentPlaylist) => currentPlaylist.id === playlistIdNum,
         );
-
         if (!playlist) {
-            // If the playlist is not found in the array, return an error.
             return res.status(HTTP_STATUS.NOT_FOUND).json({
                 message: 'Playlist not found',
             });
         }
 
         const song = songs.find((song) => song.id === songIdNum);
-        // If the song is not found in the array, return an error.
         if (!song) {
             return res.status(HTTP_STATUS.NOT_FOUND).json({
                 message: 'Song not found',
             });
         }
 
-        // Check if the song is already in the playlist
+        // Return an error if the song is already in the playlist.
         if (playlist.songIds.includes(songIdNum)) {
             return res.status(HTTP_STATUS.BAD_REQUEST).json({
                 message: 'Song already exists in the playlist',
             });
         }
 
-        // Add the songId to the playlist's songIds array
+        // Add the songId to the playlist's songIds array.
         playlist.songIds.push(songIdNum);
 
-        // Create a new array containing the full song objects
+        // Create a new array containing the full song objects based on their ID's.
         const songsInPlaylist = playlist.songIds
             .map((songId) => songs.find((song) => song.id === songId))
             .filter(Boolean);
