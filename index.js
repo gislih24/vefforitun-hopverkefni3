@@ -1,4 +1,6 @@
 // frontend link: https://2025-veff-assignment3-group1.netlify.app/
+// Vefforritun verkefni 3
+// Hópmeðlimir: Gísli Hrafn Halldórsson, Haukur Valdimarsson
 const express = require('express');
 
 /* Import a body parser module to be able to access the request body as json */
@@ -71,16 +73,13 @@ let nextPlaylistId = 4;
 app.get(apiPath + version + '/songs', (req, res) => {
     if ('filter' in req.query) {
         const filterVal = req.query.filter;
-        /* Normalize the filter value by trimming it and converting it 
-        to lowercase. */
-        const normalizedFilterValue = filterVal.trim().toLowerCase();
         /* Check if the filter value is a valid string. If it's not a string, 
         if it's an empty string, or if it's 'null' or 'undefined', we will 
         respond with BAD_REQUEST. */
         if (
-            typeof normalizedFilterValue !== 'string' ||
-            normalizedFilterValue === '' ||
-            ['null', 'undefined'].includes(normalizedFilterValue)
+            typeof filterVal !== 'string' ||
+            filterVal.trim() === '' ||
+            ['null', 'undefined'].includes(filterVal.trim().toLowerCase())
         ) {
             return res.status(HTTP_STATUS.BAD_REQUEST).json({
                 message: 'Invalid filter parameter.',
@@ -90,8 +89,8 @@ app.get(apiPath + version + '/songs', (req, res) => {
         match the (normalized) filter criteria. */
         const filteredSongs = songs.filter((song) => {
             return (
-                song.title.toLowerCase().includes(normalizedFilterValue) ||
-                song.artist.toLowerCase().includes(normalizedFilterValue)
+                song.title.toLowerCase().includes(filterVal.toLowerCase()) ||
+                song.artist.toLowerCase().includes(filterVal.toLowerCase())
             );
         });
         return res.status(HTTP_STATUS.OK).json(filteredSongs);
@@ -115,15 +114,15 @@ app.post(apiPath + version + '/songs', (req, res) => {
     }
     /* Normalize the title and artist values by trimming them and converting
     them to lowercase. */
-    const normalizedTitle = req.body.title.trim().toLowerCase();
-    const normalizedArtist = req.body.artist.trim().toLowerCase();
+    const title = req.body.title.trim();
+    const artist = req.body.artist.trim();
     /* Check if the song already exists in the songs list. 
     If so, return `BAD_REQUEST`. */
     if (
         songs.some(
             (song) =>
-                song.title.toLowerCase().trim() === normalizedTitle &&
-                song.artist.toLowerCase().trim() === normalizedArtist,
+                song.title.toLowerCase().trim() === title.toLowerCase() &&
+                song.artist.toLowerCase().trim() === artist.toLowerCase(),
         )
     ) {
         return res.status(HTTP_STATUS.BAD_REQUEST).json({
@@ -132,8 +131,8 @@ app.post(apiPath + version + '/songs', (req, res) => {
     }
     // Create new song object,
     const newSong = {
-        title: normalizedTitle,
-        artist: normalizedArtist,
+        title: title,
+        artist: artist,
         id: nextSongId,
     };
     // and add it to the songs array.
@@ -215,6 +214,12 @@ app.delete(apiPath + version + '/songs/:songId', (req, res) => {
     // Return the array without the song
     return res.status(HTTP_STATUS.OK).json(deletedSong);
 });
+// New DELETE route for requests without songId
+app.delete(apiPath + version + '/songs', (req, res) => {
+    return res
+        .status(HTTP_STATUS.METHOD_NOT_ALLOWED)
+        .json({ message: 'Method Not Allowed' });
+});
 
 /* --------------------------
 
@@ -285,10 +290,11 @@ app.post(apiPath + version + '/playlists', (req, res) => {
     }
 
     // Check if the playlist name already exists
-    const normalizedName = req.body.name.toLowerCase().trim();
+    const name = req.body.name.trim();
     if (
         playlists.some(
-            (playlist) => playlist.name.toLowerCase().trim() === normalizedName,
+            (playlist) =>
+                playlist.name.toLowerCase().trim() === name.toLowerCase(),
         )
     ) {
         return res.status(HTTP_STATUS.BAD_REQUEST).json({
@@ -299,7 +305,7 @@ app.post(apiPath + version + '/playlists', (req, res) => {
     // Create new playlist object and add it to the playlists array
     const newPlaylist = {
         id: nextPlaylistId,
-        name: normalizedName,
+        name,
         songIds: [],
     };
     playlists.push(newPlaylist);
@@ -335,12 +341,14 @@ app.patch(
             (currentPlaylist) => currentPlaylist.id === playlistIdNum,
         );
         if (!playlist) {
+            // If the playlist is not found in the array, return an error.
             return res.status(HTTP_STATUS.NOT_FOUND).json({
                 message: 'Playlist not found',
             });
         }
 
         const song = songs.find((song) => song.id === songIdNum);
+        // If the song is not found in the array, return an error.
         if (!song) {
             return res.status(HTTP_STATUS.NOT_FOUND).json({
                 message: 'Song not found',
